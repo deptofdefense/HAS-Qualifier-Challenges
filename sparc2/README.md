@@ -27,7 +27,7 @@ Building the `challenge` container requires having already built the
 `qemu:sparc` container (see the `qemu-sparc` folder).
 
 Building the `generator` and `solver` containers requires having already
-build the `rtems5:tools-sparc` containers (see the `rtems` folder).
+built the `rtems5:tools-sparc` containers (see the `rtems` folder).
 
 Building the `generator` container requires having already built the
 `generator-base` container (see the `generator-base` folder).

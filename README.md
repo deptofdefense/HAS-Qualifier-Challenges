@@ -76,11 +76,14 @@ The `qemu-sparc` folder is included to build the [qemu](https://www.qemu.org/)
 emulator that was used in the two "Sun? On My Sat?" challenges.
 
 The `rtems` folder is included to build the [RTEMS](https://www.rtems.org/)
-operationg system that was used in the TODO challenges.
+operationg system that was used in the two "Sun? On My Sat?" challenges.
 
 The `vmips-mips-emulator` folder is included to build the
 [vmips](http://www.dgate.org/vmips/) emulator that was used in the
 "LaunchLink" challenge.
+
+The `generator-base` folder is included to build the base image for all
+challenges that use a generator (see below).
 
 
 ## Building and Deploying Challenges ##
