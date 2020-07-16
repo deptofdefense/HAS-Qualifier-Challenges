@@ -1,0 +1,8 @@
+vax_os: open_bsd
+reposition_satellite_command_list: /assets/last_commands.json
+passphrase_list: /assets/passphrases.json
+server_disassembly_list: /assets/server_disassembly_files.json
+server_application_list: /assets/server_application_files.json
+server_disassembly_dir: /assets/server_disassembly
+server_application_dir: /assets/server_application
+server_application_md5_list: /assets/server_application_md5s.json

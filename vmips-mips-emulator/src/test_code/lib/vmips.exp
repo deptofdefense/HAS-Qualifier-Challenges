@@ -1,0 +1,81 @@
+# Tool init file for vmips.
+
+#
+# Returns the default test case timeout in seconds.
+#
+proc vmips_default_timeout {} {
+	return 3
+}
+
+#
+# Returns "little" or "big" according to the current configured
+# target's endianness.
+#
+proc vmips_target_endian {} {
+	global endian_option
+	if ![info exists endian_option] {
+		perror "endian_option was not set"
+		return "little"
+	}
+	if {$endian_option == "bigendian"} {
+		set target_endian "big"
+	} elseif {$endian_option == "nobigendian"} {
+		set target_endian "little"
+	}
+	return $target_endian
+}
+
+#
+# Removes the extension from FILENAME and returns the result.
+#
+proc vmips_remove_extension {filename} {
+	return [string range $filename 0 [expr [string last . $filename] - 1]]
+}
+
+#
+# Given a FILENAME, returns the same filename modified to have
+# a ".rom" extension instead of its original extension; e.g.,
+# turns "foo.S" into "foo.rom".
+#
+proc vmips_get_romfile_name {filename} {
+	global subdir objdir
+	set base [vmips_basename [vmips_remove_extension $filename]]
+	return "$objdir/$subdir/${base}.rom"
+}
+
+#
+# Runs "make" to build the romfile with given FILENAME, unless a file
+# by that name already exists.
+#
+proc vmips_build_romfile {filename} {
+    global subdir objdir
+	if ![file exists $filename] {
+		# First, chdir to the subdir where configure created
+		# the testcase's makefile.
+		set curdir [pwd]
+		cd "$objdir/$subdir"
+		exec make [vmips_basename $filename]
+		cd $curdir
+	}
+	if ![file exists $filename] {
+		perror "Could not build test ROM file `$filename'"
+	}
+}
+
+#
+# vmips_basename NAME [SUFFIX]
+# Print NAME with any leading directory components removed.
+# If specified, also remove a trailing SUFFIX.
+#
+proc vmips_basename {name args} {
+    set rv [string range $name [expr [string last / $name] + 1] end]
+	if {[llength $args] == 1} {
+		set suffix [lindex $args 0]
+		if {[endswith $rv $suffix]} {
+			set rv [string range $rv 0 [expr [string length $rv] \
+			                            - [string length $suffix] - 1]]
+		}
+	}
+	return $rv
+}
+

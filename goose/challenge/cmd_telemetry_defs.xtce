@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xtce:SpaceSystem xmlns:xtce="http://www.omg.org/space/xtce" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.omg.org/space/xtce:\DOCUME~1\jmuller\MYDOCU~1\De
+velopment\Converters\XSD\SpaceSystemV1.1.xsd" name="Challenge1">
+<xtce:LongDescription>This file is intented to give a quick overview of XTCE for CCSDS
+based mission. This examples does not cover all possibilities of XTCE but tries to give relevant
+examples of the main points covered by the standard. </xtce:LongDescription>
+<xtce:Header validationStatus="Validated" date="2006-01-23" version="0.1"/>
+ <xtce:TelemetryMetaData>
+ <xtce:ParameterTypeSet>
+    <!-- Parameter types used by frames and packets (no data parameter) -->
+    <xtce:IntegerParameterType name="4ByteInteger" signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="32" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="2ByteInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="16" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="1ByteInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="8" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="14BitInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="14" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="11BitInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="11" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="10BitInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="10" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="7BitInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="7" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="6BitInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="6" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="4BitInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="4" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="3BitInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="3" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="2BitInteger"  signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="2" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:IntegerParameterType name="1BitInteger" signed="false">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="1" encoding="unsigned"/>
+    </xtce:IntegerParameterType>
+    <xtce:EnumeratedParameterType name="PWR_STATUS" initialValue="PWR_ON">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="1"/>
+    <xtce:EnumerationList>
+    <xtce:Enumeration label="PWR_ON" value="1"/>
+    <xtce:Enumeration label="PWR_OFF" value="0"/>
+    </xtce:EnumerationList>
+    </xtce:EnumeratedParameterType>
+    <xtce:EnumeratedParameterType name="ENABLED_STATUS" initialValue="ENABLED">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="1"/>
+    <xtce:EnumerationList>
+    <xtce:Enumeration label="ENABLED" value="1"/>
+    <xtce:Enumeration label="DISABLED" value="0"/>
+    </xtce:EnumerationList>
+    </xtce:EnumeratedParameterType>
+    <xtce:EnumeratedParameterType name="MODE_STATUS" initialValue="ON">
+    <xtce:UnitSet/>
+    <xtce:IntegerDataEncoding sizeInBits="1"/>
+    <xtce:EnumerationList>
+    <xtce:Enumeration label="ON" value="1"/>
+    <xtce:Enumeration label="OFF" value="0"/>
+    </xtce:EnumerationList>
+    </xtce:EnumeratedParameterType>
+    <xtce:FloatParameterType sizeInBits="16" name="TempType">
+    <xtce:UnitSet>
+    <xtce:Unit description="F">:F</xtce:Unit>
+    </xtce:UnitSet>
+    <xtce:IntegerDataEncoding sizeInBits="16" encoding="twosCompliment">
+    <xtce:DefaultCalibrator>
+    <xtce:PolynomialCalibrator>
+    <xtce:Term coefficient="0.0" exponent="0"/>
+    <xtce:Term coefficient="0.1" exponent="1"/>
+    </xtce:PolynomialCalibrator>
+    </xtce:DefaultCalibrator>
+    </xtce:IntegerDataEncoding>
+    </xtce:FloatParameterType>
+    <xtce:FloatParameterType sizeInBits="32" name="VoltageType">
+    <xtce:UnitSet>
+    <xtce:Unit description="V">:V</xtce:Unit>
+    </xtce:UnitSet>
+    <xtce:IntegerDataEncoding sizeInBits="16" encoding="unsigned">
+    <xtce:DefaultCalibrator>
+    <xtce:PolynomialCalibrator>
+    <xtce:Term coefficient="9.0" exponent="0"/>
+    <xtce:Term coefficient="0.01" exponent="1"/>
+    </xtce:PolynomialCalibrator>
+    </xtce:DefaultCalibrator>
+    </xtce:IntegerDataEncoding>
+    </xtce:FloatParameterType>
+    <xtce:BinaryParameterType name="PayloadBlob">
+    <xtce:UnitSet/>
+    <xtce:BinaryDataEncoding sizeInBits="96"/>
+    </xtce:BinaryParameterType>
+ </xtce:ParameterTypeSet>
+ <xtce:ParameterSet>
+    <!-- Filler parameters for unused bits-->
+    <xtce:Parameter parameterTypeRef="1BitInteger" name="UNUSED1"/>
+    <xtce:Parameter parameterTypeRef="2BitInteger" name="UNUSED2"/>
+    <xtce:Parameter parameterTypeRef="3BitInteger" name="UNUSED3"/>
+    <xtce:Parameter parameterTypeRef="4BitInteger" name="UNUSED4"/>
+    <!-- Parameters used by space packet primary header -->
+    <xtce:Parameter parameterTypeRef="3BitInteger" name="CCSDS_VERSION"/>
+    <xtce:Parameter parameterTypeRef="1BitInteger" name="CCSDS_TYPE"/>
+    <xtce:Parameter parameterTypeRef="1BitInteger" name="CCSDS_SEC_HD"/>
+    <xtce:Parameter parameterTypeRef="11BitInteger" name="CCSDS_APID"/>
+    <xtce:Parameter parameterTypeRef="2BitInteger" name="CCSDS_GP_FLAGS"/>
+    <xtce:Parameter parameterTypeRef="14BitInteger" name="CCSDS_SSC"/>
+    <xtce:Parameter parameterTypeRef="2ByteInteger" name="CCSDS_PLENGTH"/>
+    <!-- Parameters used by EPS  -->
+    <xtce:Parameter parameterTypeRef="TempType" name="BATT_TEMP"/>
+    <xtce:Parameter parameterTypeRef="2ByteInteger" name="FLAG22"/>
+    <xtce:Parameter parameterTypeRef="VoltageType" name="BATT_VOLTAGE"/>
+    <xtce:Parameter parameterTypeRef="VoltageType" name="LOW_PWR_THRESH"/>
+    <xtce:Parameter parameterTypeRef="PWR_STATUS" name="FLAG_PWR"/>
+    <xtce:Parameter parameterTypeRef="PWR_STATUS" name="PAYLOAD_PWR"/>
+    <xtce:Parameter parameterTypeRef="PWR_STATUS" name="ADCS_PWR"/>
+    <xtce:Parameter parameterTypeRef="PWR_STATUS" name="RADIO1_PWR"/>
+    <xtce:Parameter parameterTypeRef="PWR_STATUS" name="RADIO2_PWR"/>
+    <xtce:Parameter parameterTypeRef="MODE_STATUS" name="LOW_PWR_MODE"/>
+    <xtce:Parameter parameterTypeRef="PWR_STATUS" name="BATT_HTR"/>
+    <xtce:Parameter parameterTypeRef="ENABLED_STATUS" name="FLAG_ENABLE"/>
+    <xtce:Parameter parameterTypeRef="ENABLED_STATUS" name="PAYLOAD_ENABLE"/>
+    <xtce:Parameter parameterTypeRef="ENABLED_STATUS" name="ADCS_ENABLE"/>
+    <xtce:Parameter parameterTypeRef="ENABLED_STATUS" name="RADIO1_ENABLE"/>
+    <xtce:Parameter parameterTypeRef="ENABLED_STATUS" name="RADIO2_ENABLE"/>
+    <xtce:Parameter parameterTypeRef="4ByteInteger" name="BAD_CMD_COUNT"/>
+    <!-- Parameters used by Payload  -->
+    <xtce:Parameter parameterTypeRef="4ByteInteger" name="PAYLOAD_FLAG1"/>
+    <xtce:Parameter parameterTypeRef="4ByteInteger" name="PAYLOAD_FLAG2"/>
+    <xtce:Parameter parameterTypeRef="4ByteInteger" name="PAYLOAD_FLAG3"/>
+    <xtce:Parameter parameterTypeRef="PayloadBlob" name="PAYLOAD_DATA"/>
+    <!-- Parameters used by FLAG Gen  -->
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG11"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG12"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG13"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG14"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG15"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG16"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG17"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG18"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG19"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG10"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG1"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG2"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG3"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG4"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG5"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG6"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG7"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG8"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG9"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG20"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG21"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG22"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG23"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG24"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG25"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG26"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG27"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG28"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG29"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG41"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG42"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG43"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG44"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG45"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG46"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG47"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG48"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG49"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG61"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG62"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG63"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG64"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG65"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG66"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG67"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG68"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG69"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG81"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG82"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG83"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG84"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG85"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG86"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG87"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG88"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG89"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG31"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG32"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG33"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG34"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG35"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG36"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG37"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG38"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG39"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG51"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG52"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG53"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG54"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG55"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG56"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG57"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG58"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG59"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG71"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG72"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG73"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG74"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG75"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG76"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG77"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG78"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG79"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG91"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG92"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG93"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG94"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG95"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG96"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG97"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG98"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG99"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG100"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG20"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG30"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG40"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG50"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG60"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG70"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG80"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG90"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG101"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG102"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG103"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG104"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG105"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG106"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG107"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG108"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG109"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG110"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG111"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG112"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG113"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG114"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG115"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG116"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG117"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG118"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG119"/>
+    <xtce:Parameter parameterTypeRef="7BitInteger" name="FLAG120"/>
+ </xtce:ParameterSet>
+ <xtce:ContainerSet>
+ <xtce:SequenceContainer name="AbstractTM Packet Header" shortDescription="CCSDS TM Packet Header" abstract="true">
+    <xtce:EntryList>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_VERSION"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_TYPE"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_SEC_HD"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_APID"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_GP_FLAGS"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_SSC"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_PLENGTH"/>
+    </xtce:EntryList>
+ </xtce:SequenceContainer>
+<xtce:SequenceContainer name="EPS Packet" shortDescription="packet of EPS data">
+ <xtce:EntryList>
+ <xtce:ParameterRefEntry parameterRef="BATT_TEMP"/>
+ <xtce:ParameterRefEntry parameterRef="BATT_VOLTAGE"/>
+ <xtce:ParameterRefEntry parameterRef="LOW_PWR_THRESH"/>
+ <xtce:ParameterRefEntry parameterRef="LOW_PWR_MODE"/>
+ <xtce:ParameterRefEntry parameterRef="BATT_HTR"/>
+ <xtce:ParameterRefEntry parameterRef="PAYLOAD_PWR"/>
+ <xtce:ParameterRefEntry parameterRef="FLAG_PWR"/>
+ <xtce:ParameterRefEntry parameterRef="ADCS_PWR"/>
+ <xtce:ParameterRefEntry parameterRef="RADIO1_PWR"/>
+ <xtce:ParameterRefEntry parameterRef="RADIO2_PWR"/>
+ <xtce:ParameterRefEntry parameterRef="UNUSED1"/>
+ <xtce:ParameterRefEntry parameterRef="PAYLOAD_ENABLE"/>
+ <xtce:ParameterRefEntry parameterRef="FLAG_ENABLE"/>
+ <xtce:ParameterRefEntry parameterRef="ADCS_ENABLE"/>
+ <xtce:ParameterRefEntry parameterRef="RADIO1_ENABLE"/>
+ <xtce:ParameterRefEntry parameterRef="RADIO2_ENABLE"/>
+ <xtce:ParameterRefEntry parameterRef="UNUSED3"/>
+  <xtce:ParameterRefEntry parameterRef="BAD_CMD_COUNT"/>
+  </xtce:EntryList>
+    <xtce:BaseContainer containerRef="AbstractTM Packet Header">
+        <xtce:RestrictionCriteria>
+            <xtce:ComparisonList>
+                <xtce:Comparison parameterRef="CCSDS_VERSION" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_TYPE" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_SEC_HD" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_APID" value="103"/>
+            </xtce:ComparisonList>
+        </xtce:RestrictionCriteria>
+    </xtce:BaseContainer>
+ </xtce:SequenceContainer> 
+<xtce:SequenceContainer name="Payload Packet" shortDescription="packet of payload data">
+ <xtce:EntryList>
+ <xtce:ParameterRefEntry parameterRef="PAYLOAD_DATA"/>
+ </xtce:EntryList>
+    <xtce:BaseContainer containerRef="AbstractTM Packet Header">
+        <xtce:RestrictionCriteria>
+            <xtce:ComparisonList>
+                <xtce:Comparison parameterRef="CCSDS_VERSION" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_TYPE" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_SEC_HD" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_APID" value="105"/>
+            </xtce:ComparisonList>
+        </xtce:RestrictionCriteria>
+    </xtce:BaseContainer>
+ </xtce:SequenceContainer>
+<xtce:SequenceContainer name="Flag Packet" shortDescription="packet of flag data">
+ <xtce:EntryList>
+        <xtce:ParameterRefEntry parameterRef="FLAG1"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG2"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG3"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG4"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG5"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG6"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG7"/> 
+        <xtce:ParameterRefEntry parameterRef="FLAG8"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG9"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG10"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG11"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG12"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG13"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG14"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG15"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG16"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG17"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG18"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG19"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG20"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG21"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG22"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG23"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG24"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG25"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG26"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG27"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG28"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG29"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG30"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG31"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG32"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG33"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG34"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG35"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG36"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG37"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG38"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG39"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG40"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG41"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG42"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG43"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG44"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG45"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG46"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG47"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG48"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG49"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG50"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG51"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG52"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG53"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG54"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG55"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG56"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG57"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG58"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG59"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG60"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG61"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG62"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG63"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG64"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG65"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG66"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG67"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG68"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG69"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG70"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG71"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG72"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG73"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG74"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG75"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG76"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG77"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG78"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG79"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG80"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG81"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG82"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG83"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG84"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG85"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG86"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG87"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG88"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG89"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG90"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG91"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG92"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG93"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG94"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG95"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG96"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG97"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG98"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG99"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG100"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG101"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG102"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG103"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG104"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG105"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG106"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG107"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG108"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG109"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG110"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG111"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG112"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG113"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG114"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG115"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG116"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG117"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG118"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG119"/>
+        <xtce:ParameterRefEntry parameterRef="FLAG120"/>
+ </xtce:EntryList>
+    <xtce:BaseContainer containerRef="AbstractTM Packet Header">
+        <xtce:RestrictionCriteria>
+            <xtce:ComparisonList>
+                <xtce:Comparison parameterRef="CCSDS_VERSION" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_TYPE" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_SEC_HD" value="0"/>
+                <xtce:Comparison parameterRef="CCSDS_APID" value="102"/>
+            </xtce:ComparisonList>
+        </xtce:RestrictionCriteria>
+    </xtce:BaseContainer>
+ </xtce:SequenceContainer>
+ </xtce:ContainerSet>
+</xtce:TelemetryMetaData>
+
+<xtce:CommandMetaData>
+<xtce:ArgumentTypeSet>
+<xtce:IntegerArgumentType name="1ByteInteger"  signed="false">
+<xtce:UnitSet/>
+<xtce:IntegerDataEncoding sizeInBits="8" encoding="unsigned"/>
+</xtce:IntegerArgumentType>
+<xtce:EnumeratedArgumentType name="EnableState" initialValue="ENABLE">
+<xtce:UnitSet/>
+<xtce:IntegerDataEncoding sizeInBits="8" signed="false"/>
+<xtce:EnumerationList>
+<xtce:Enumeration label="ENABLE" value="1"/>
+<xtce:Enumeration label="DISABLE" value="0"/>
+</xtce:EnumerationList>
+</xtce:EnumeratedArgumentType>
+<xtce:StringArgumentType name="Enable">
+<xtce:UnitSet/>
+</xtce:StringArgumentType>
+<xtce:FloatArgumentType sizeInBits="32" name="VoltageArgType">
+<xtce:UnitSet>
+<xtce:Unit description="V">:V</xtce:Unit>
+</xtce:UnitSet>
+<xtce:IntegerDataEncoding sizeInBits="16" encoding="unsigned">
+<xtce:DefaultCalibrator>
+<xtce:PolynomialCalibrator>
+<xtce:Term coefficient="-90.0" exponent="0"/>
+<xtce:Term coefficient="100.0" exponent="1"/>
+</xtce:PolynomialCalibrator>
+</xtce:DefaultCalibrator>
+</xtce:IntegerDataEncoding>
+</xtce:FloatArgumentType>
+</xtce:ArgumentTypeSet>
+ <xtce:ParameterSet>
+    <xtce:Parameter parameterTypeRef="1ByteInteger" name="CMD" initialValue="4" readOnly="true"/>
+    <xtce:Parameter parameterTypeRef="1ByteInteger" name="PARAM" initialValue="4" readOnly="true"/>
+</xtce:ParameterSet>
+ <xtce:MetaCommand name="AbstractCMD Packet Header" shortDescription="CCSDS CMD Packet Header" abstract="true">
+    <xtce:EntryList>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_VERSION"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_TYPE"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_SEC_HD"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_APID"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_GP_FLAGS"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_SSC"/>
+        <xtce:ParameterRefEntry parameterRef="CCSDS_PLENGTH"/>
+    </xtce:EntryList>
+        <xtce:RestrictionCriteria>
+        <xtce:ComparisonList>
+            <xtce:Comparison parameterRef="CCSDS_VERSION" value="0"/>
+            <xtce:Comparison parameterRef="CCSDS_TYPE" value="1"/>
+            <xtce:Comparison parameterRef="CCSDS_SEC_HD" value="0"/>
+            <xtce:Comparison parameterRef="CCSDS_GP_FLAGS" value="3"/>
+            
+        </xtce:ComparisonList>
+    </xtce:RestrictionCriteria>
+ </xtce:MetaCommand>
+<xtce:MetaCommand name="EnableFLAG" abstract="false">
+<xtce:BaseMetaCommand metaCommandRef="AbstractCMD Packet Header">
+    <xtce:RestrictionCriteria>
+        <xtce:ComparisonList>
+            <xtce:Comparison parameterRef="CCSDS_APID" value="103"/>
+            <xtce:Comparison parameterRef="CCSDS_PLENGTH" value="2"/>
+        </xtce:ComparisonList>
+    </xtce:RestrictionCriteria>
+</xtce:BaseMetaCommand>
+<xtce:ArgumentList>
+<xtce:Argument argumentTypeRef="EnableState" name="PowerState"/>
+</xtce:ArgumentList>
+<xtce:CommandContainer name="ADCSenable">
+<xtce:EntryList>
+<xtce:ParameterRefEntry parameterRef="CMD"/>
+<xtce:ParameterRefEntry parameterRef="PARAM"/>
+<xtce:ArgumentRefEntry argumentRef="PowerState" />
+</xtce:EntryList>
+<xtce:RestrictionCriteria>
+<xtce:Comparison parameterRef="CMD" value="0"/>
+<xtce:Comparison parameterRef="PARAM" value="2"/>
+</xtce:RestrictionCriteria>
+</xtce:CommandContainer>
+</xtce:MetaCommand>
+<xtce:MetaCommand name="EnablePayload" abstract="false">
+<xtce:BaseMetaCommand metaCommandRef="AbstractCMD Packet Header">
+    <xtce:RestrictionCriteria>
+        <xtce:ComparisonList>
+            <xtce:Comparison parameterRef="CCSDS_APID" value="103"/>
+            <xtce:Comparison parameterRef="CCSDS_PLENGTH" value="2"/>
+        </xtce:ComparisonList>
+    </xtce:RestrictionCriteria>
+</xtce:BaseMetaCommand>
+<xtce:ArgumentList>
+<xtce:Argument argumentTypeRef="EnableState" name="PowerState"/>
+</xtce:ArgumentList>
+<xtce:CommandContainer name="ADCSenable">
+<xtce:EntryList>
+<xtce:ParameterRefEntry parameterRef="CMD"/>
+<xtce:ParameterRefEntry parameterRef="PARAM"/>
+<xtce:ArgumentRefEntry argumentRef="PowerState" />
+</xtce:EntryList>
+<xtce:RestrictionCriteria>
+<xtce:Comparison parameterRef="CMD" value="0"/>
+<xtce:Comparison parameterRef="PARAM" value="0"/>
+</xtce:RestrictionCriteria>
+</xtce:CommandContainer>
+</xtce:MetaCommand>
+<xtce:MetaCommand name="EnableADCS" abstract="false">
+<xtce:BaseMetaCommand metaCommandRef="AbstractCMD Packet Header">
+    <xtce:RestrictionCriteria>
+        <xtce:ComparisonList>
+            <xtce:Comparison parameterRef="CCSDS_APID" value="103"/>
+            <xtce:Comparison parameterRef="CCSDS_PLENGTH" value="2"/>
+        </xtce:ComparisonList>
+    </xtce:RestrictionCriteria>
+</xtce:BaseMetaCommand>
+<xtce:ArgumentList>
+<xtce:Argument argumentTypeRef="EnableState" name="PowerState"/>
+</xtce:ArgumentList>
+<xtce:CommandContainer name="ADCSenable">
+<xtce:EntryList>
+<xtce:ParameterRefEntry parameterRef="CMD"/>
+<xtce:ParameterRefEntry parameterRef="PARAM"/>
+<xtce:ArgumentRefEntry argumentRef="PowerState" />
+</xtce:EntryList>
+<xtce:RestrictionCriteria>
+<xtce:Comparison parameterRef="CMD" value="0"/>
+<xtce:Comparison parameterRef="PARAM" value="4"/>
+</xtce:RestrictionCriteria>
+</xtce:CommandContainer>
+</xtce:MetaCommand>
+<xtce:MetaCommand name="EnableRadio1" abstract="false">
+<xtce:BaseMetaCommand metaCommandRef="AbstractCMD Packet Header">
+    <xtce:RestrictionCriteria>
+        <xtce:ComparisonList>
+            <xtce:Comparison parameterRef="CCSDS_APID" value="103"/>
+            <xtce:Comparison parameterRef="CCSDS_PLENGTH" value="2"/>
+        </xtce:ComparisonList>
+    </xtce:RestrictionCriteria>
+</xtce:BaseMetaCommand>
+<xtce:ArgumentList>
+<xtce:Argument argumentTypeRef="EnableState" name="PowerState"/>
+</xtce:ArgumentList>
+<xtce:CommandContainer name="ADCSenable">
+<xtce:EntryList>
+<xtce:ParameterRefEntry parameterRef="CMD"/>
+<xtce:ParameterRefEntry parameterRef="PARAM"/>
+<xtce:ArgumentRefEntry argumentRef="PowerState" />
+</xtce:EntryList>
+<xtce:RestrictionCriteria>
+<xtce:Comparison parameterRef="CMD" value="0"/>
+<xtce:Comparison parameterRef="PARAM" value="5"/>
+</xtce:RestrictionCriteria>
+</xtce:CommandContainer>
+</xtce:MetaCommand>
+<xtce:MetaCommand name="EnableRadio2" abstract="false">
+<xtce:BaseMetaCommand metaCommandRef="AbstractCMD Packet Header">
+    <xtce:RestrictionCriteria>
+        <xtce:ComparisonList>
+            <xtce:Comparison parameterRef="CCSDS_APID" value="103"/>
+            <xtce:Comparison parameterRef="CCSDS_PLENGTH" value="2"/>
+        </xtce:ComparisonList>
+    </xtce:RestrictionCriteria>
+</xtce:BaseMetaCommand>
+<xtce:ArgumentList>
+<xtce:Argument argumentTypeRef="EnableState" name="PowerState"/>
+</xtce:ArgumentList>
+<xtce:CommandContainer name="ADCSenable">
+<xtce:EntryList>
+<xtce:ParameterRefEntry parameterRef="CMD"/>
+<xtce:ParameterRefEntry parameterRef="PARAM"/>
+<xtce:ArgumentRefEntry argumentRef="PowerState" />
+</xtce:EntryList>
+<xtce:RestrictionCriteria>
+<xtce:Comparison parameterRef="CMD" value="0"/>
+<xtce:Comparison parameterRef="PARAM" value="8"/>
+</xtce:RestrictionCriteria>
+</xtce:CommandContainer>
+</xtce:MetaCommand>
+<xtce:MetaCommand name="LOW_PWR_THRES" abstract="false">
+<xtce:BaseMetaCommand metaCommandRef="AbstractCMD Packet Header">
+    <xtce:RestrictionCriteria>
+        <xtce:ComparisonList>
+            <xtce:Comparison parameterRef="CCSDS_APID" value="103"/>
+            <xtce:Comparison parameterRef="CCSDS_PLENGTH" value="3"/>
+        </xtce:ComparisonList>
+    </xtce:RestrictionCriteria>
+</xtce:BaseMetaCommand>
+<xtce:ArgumentList>
+<xtce:Argument argumentTypeRef="VoltageArgType" name="LW_PWR_THRES"/>
+</xtce:ArgumentList>
+<xtce:CommandContainer name="ADCSenable">
+<xtce:EntryList>
+<xtce:ParameterRefEntry parameterRef="CMD"/>
+<xtce:ParameterRefEntry parameterRef="PARAM"/>
+<xtce:ArgumentRefEntry argumentRef="LW_PWR_THRES" />
+</xtce:EntryList>
+<xtce:RestrictionCriteria>
+<xtce:Comparison parameterRef="CMD" value="0"/>
+<xtce:Comparison parameterRef="PARAM" value="12"/>
+</xtce:RestrictionCriteria>
+</xtce:CommandContainer>
+</xtce:MetaCommand>
+</xtce:CommandMetaData>
+</xtce:SpaceSystem>

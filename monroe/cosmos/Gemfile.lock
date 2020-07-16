@@ -1,0 +1,56 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    coderay (1.1.2)
+    cosmos (4.4.2)
+      bundler (>= 1.3)
+      httpclient (~> 2.8)
+      json (>= 1.5, < 3)
+      nokogiri (~> 1.10)
+      opengl-bindings (~> 1.6)
+      pry (~> 0.9)
+      pry-doc (~> 0.5)
+      puma (~> 3.10)
+      qtbindings (~> 4.8.6, >= 4.8.6.2)
+      rack (~> 2.0)
+      rake (>= 10.0)
+      rdoc (>= 4)
+      rubyzip (~> 1.2)
+      snmp (~> 1.0)
+      uuidtools (~> 2.1)
+      yard (~> 0.9.11)
+    httpclient (2.8.3)
+    json (2.3.0)
+    method_source (1.0.0)
+    mini_portile2 (2.4.0)
+    nokogiri (1.10.9)
+      mini_portile2 (~> 2.4.0)
+    opengl-bindings (1.6.9)
+    openssl (2.1.2)
+    pry (0.13.0)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    pry-doc (0.13.5)
+      pry (~> 0.11)
+      yard (~> 0.9.11)
+    puma (3.12.4)
+    qtbindings (4.8.6.5)
+    rack (2.2.2)
+    rake (13.0.1)
+    rdoc (6.2.1)
+    ruby-termios (0.9.6)
+    rubyzip (1.3.0)
+    snmp (1.3.2)
+    uuidtools (2.1.5)
+    yard (0.9.24)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  cosmos
+  openssl
+  ruby-termios (~> 0.9)
+
+BUNDLED WITH
+   2.1.2

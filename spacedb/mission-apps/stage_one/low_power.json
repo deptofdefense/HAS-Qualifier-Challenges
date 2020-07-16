@@ -1,0 +1,18 @@
+{
+    "tasks": [
+        {
+            "description": "Charge battery until ready for transmission.",
+            "delay": "5s",
+            "app": {
+                "name": "low_power"
+            }
+        },
+        {
+            "description": "Switch into transmission mode.",
+            "time": 0,
+            "app": {
+                "name": "activate_transmission_mode"
+            }
+        }
+    ]
+}

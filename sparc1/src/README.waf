@@ -1,0 +1,62 @@
+RTEMS Waf
+~~~~~~~~~
+
+You can find the Waf project here:
+
+ https://waf.io
+
+Simple instructions on How to set up Waf is here:
+
+ http://www.rtems.org/ftp/pub/rtems/people/chrisj/rtl/rtems-linker/waf.html
+
+Steps
+-----
+
+1. Build or install the tools. In this example the path is
+   $HOME/Development/rtems/5.
+
+2. Build and install the RTEMS Board Support Packages you want to use. In this
+   example the path is $HOME/Development/rtems/build/5.
+
+3. Unpack this package somewhere, anywhere on your disk and change into the top
+   level directory.
+
+4. Populate the git submodule:
+
+    $ git submodule init
+    $ git submodule update
+
+5. Configure with your specific settings. In this case the path to the tools
+   and RTEMS and provided on the command line and so do not need to be in your
+   path or environment [1] and we limit the build to a single BSP. The single
+   BSP should be the 'sparc/erc32' BSP since this is the easiest BSP to use
+   on a simulator. After you have successfully build the executables for this
+   BSP and run them on the simulator, you can repeat this exercise with the
+   BSP you are most interested in.
+
+    $ waf configure --rtems=$HOME/Development/rtems/build/5 \
+                    --rtems-tools=$HOME/Development/rtems/5 \
+                    --rtems-bsps=sparc/erc32
+
+   You can use '--rtems-archs=sparc,i386' or
+   '--rtems-bsps=sparc/erc32,i386/pc586' to build for more than BSP at a time.
+
+6. Build:
+
+   $ waf
+
+7. Run the executable using the simulator:
+
+    $ $HOME/Development/rtems/5/bin/sparc-rtems5-run \
+       ./build/sparc-rtems5-erc32/hello
+
+[1] It is good practice to keep your environment as empty as possible. Setting
+    paths to tools or specific values to configure or control builds is
+    dangerous because settings can leak between different builds and change
+    what you expect a build to do. The waf tool used here lets you specify on
+    the command line the tools and RTEMS paths and this is embedded in waf's
+    configuration information. If you have a few source trees working at any
+    one time with different tool sets or configurations you can easly move
+    between them safe in the knowledge that one build will not infect another.
+
+

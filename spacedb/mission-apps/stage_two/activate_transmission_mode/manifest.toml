@@ -1,0 +1,5 @@
+name = "activate_transmission_mode"
+executable = "activate_transmission_mode.py"
+config = "/challenge/local_config.toml"
+version = "0.1"
+author = "ultron-browser"

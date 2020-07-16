@@ -1,0 +1,68 @@
+##########################
+Mission Planning Challenge
+##########################
+The current time is April 22, 2020 at midnight (2020-04-22T00:00:00Z).
+We need to obtain images of the Iranian space port (35.234722 N 53.920833 E) with our satellite within the next 48 hours.
+You must design a mission plan that obtains the images and downloads them within the time frame without causing any system failures on the spacecraft, or putting it at risk of continuing operations.
+The spacecraft in question is USA 224 in the NORAD database with the following TLE:
+
+1 37348U 11002A   20053.50800700  .00010600  00000-0  95354-4 0    09
+2 37348  97.9000 166.7120 0540467 271.5258 235.8003 14.76330431    04
+
+The TLE and all locations are already known by the simulator, and are provided for your information only.
+
+Requirements
+############
+You need to obtain 120 MB of image data of the target location and downlink it to our ground station in Fairbanks, AK (64.977488 N 147.510697 W).
+Your mission will begin at 2020-04-22T00:00:00Z and last 48 hours.
+You are submitting a mission plan to a simulator that will ensure the mission plan will not put the spacecraft at risk, and will accomplish the desired objectives.
+
+Mission Plan
+############
+Enter the mission plan into the interface, where each line corresponds to an entry.
+You can copy/paste multiple lines at once into the interface.
+The simulation runs once per minute, so all entries must have 00 for the seconds field.
+Each line must be a timestamp followed by the mode with the format:
+
+2020-04-22T00:00:00Z sun_point
+YYYY-MM-DDThh:mm:00Z next_mode
+...
+
+The mission will run for it's full duration, regardless of when the image data if obtained.
+You must ensure the bus survives the entire duration.
+
+Mode Information
+################
+The bus has 4 possible modes:
+
+- sun_point: Charges the batteries by pointing the panels at the sun.
+- imaging: Trains the imager on the target location and begins capturing image data.
+- data_downlink: Slews the spacecraft to point it's high bandwidth downlink transmitter at the ground station and transmits data to the station.
+- wheel_desaturate: Desaturates the spacecraft reaction wheels using the on board magnetorquers.
+
+Each mode dictates the entire state of the spacecraft.
+The required inputs for each mode are already known by the mission planner.
+
+Bus Information
+###############
+The onboard computer has 95 MB of storage.
+All bus components are rated to operate effectively between 0 and 60 degrees Celsius.
+The battery cannot fall below 10% capacity, or it will reduce the life of the spacecraft.
+The reaction wheels have a maximum speed of 7000 RPM.
+You will received telemetry from the spacecraft throughout the simulated mission duration.
+You will need to monitor this telemetry to derive the behavior of each mode.
+
+########################################################################
+
+Please input mission plan in order by time.
+Each line must be a timestamp followed by the mode with the format:
+
+                    YYYY-MM-DDThh:mm:ssZ new_mode
+
+Usage:
+
+   run  -- Starts simulation
+   plan -- Lists current plan entries
+   exit -- Exits
+
+Once your plan is executed, it will not be saved, so make note of your plan elsewhere.

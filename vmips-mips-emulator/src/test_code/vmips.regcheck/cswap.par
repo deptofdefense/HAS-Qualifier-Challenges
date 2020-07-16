@@ -1,0 +1,12 @@
+# BUILD RULES: testcase_simple_asm -setup 1 cswap
+regcheck_set_results {
+    R11 fffcffff
+    R13 20130003
+    R14 20140004
+    R15 03e00008
+    R17 80001000
+    R18 80011000
+    R19 00000003
+    R20 00000004
+    R24 00000000
+}

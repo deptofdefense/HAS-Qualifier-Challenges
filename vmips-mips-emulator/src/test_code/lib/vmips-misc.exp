@@ -1,0 +1,30 @@
+
+#
+# Set up some basic stuff for the benefit of a "misc-tests"
+# test case named TESTCASENAME. "misc-tests" are tests that do not fit
+# into any particular framework, so this is necessarily a fairly minimal
+# procedure.
+#
+# What it does is:
+# 1. set up the testdir, testcase, vmips, and romfile variables to contain
+#   the name of the directory containing the testcase, 
+#   the name of the testcase (for "pass"/"fail" statements),
+#   the name of the vmips binary and
+#   the name of the ROM file (the latter two of which the testcase should
+#     subsequently pass to the "spawn" command.)
+# 2. set the default Expect timeout
+# 3. build the ROM file if it is not already built.
+#
+proc misc_test_setup {testcasename} {
+	global testdir testcase timeout vmips romfile srcdir subdir objdir
+
+	set testdir $srcdir/$subdir
+	set testobjdir $objdir/$subdir
+	set testobjbase $testobjdir/$testcasename
+	set testcase ${testobjbase}.exp
+	set vmips [vmips_tool_exec_name]
+	set romfile ${testobjbase}.rom
+	set timeout [vmips_default_timeout]
+	vmips_build_romfile $romfile
+}
+

@@ -1,0 +1,15 @@
+service basic_service
+{
+    disable     = no
+    id          = basic_service
+    socket_type = stream
+    protocol    = tcp
+    flags       = IPv4 IPv6
+    port        = 12345
+    wait        = no
+    user        = ubuntu
+    group       = docker
+    server      = /home/ubuntu/ticket-taker/bin/ticket-taker
+    env         = CONFIG_DIR=/home/ubuntu/basic-service
+    type        = UNLISTED
+}

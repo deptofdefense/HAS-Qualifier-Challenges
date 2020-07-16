@@ -1,0 +1,5 @@
+name = "disable_downlink"
+executable = "disable_downlink.py"
+config = "/challenge/local_config.toml"
+version = "0.1"
+author = "ultron-browser"

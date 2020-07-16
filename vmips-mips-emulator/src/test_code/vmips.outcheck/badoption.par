@@ -1,0 +1,3 @@
+OPTIONS: -o asdfasdf
+BUILD RULES: testcase_empty
+GREP: Error: Unknown option: asdfasdf

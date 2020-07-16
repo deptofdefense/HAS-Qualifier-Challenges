@@ -1,0 +1,46 @@
+[app-service]
+registry-dir = "app-registry"
+
+[app-service.addr]
+ip = "127.0.0.1"
+port = 8000
+
+[scheduler-service]
+schedules_dir = "schedules"
+
+[scheduler-service.addr]
+ip = "127.0.0.1"
+port = 8110
+
+[telemetry-service]
+database = "telemetry.db"
+direct_port = 8021
+
+[telemetry-service.addr]
+ip = "127.0.0.1"
+port = 8020
+
+[tel-service]
+database = "telemetry.db"
+direct_port = 8121
+
+[tel-service.addr]
+ip = "0.0.0.0"
+port = 8120
+
+[file-transfer-service]
+storage_dir = "file-storage"
+downlink_ip = "127.0.0.1"
+downlink_port = 8080
+
+[file-transfer-service.addr]
+ip = "127.0.0.1"
+port = 8040
+
+[monitor-service.addr]
+ip = "127.0.0.1"
+port = 8030
+
+[shell-service.addr]
+ip = "127.0.0.1"
+port = 8050

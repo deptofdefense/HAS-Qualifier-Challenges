@@ -1,0 +1,3 @@
+[submodule "rtems_waf"]
+	path = rtems_waf
+	url = git://git.rtems.org/rtems_waf.git

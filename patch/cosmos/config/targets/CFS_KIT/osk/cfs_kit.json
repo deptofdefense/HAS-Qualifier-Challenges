@@ -1,0 +1,21 @@
+{
+
+"description": [
+   "This file is named cfs_kit.json as opposed to something like",
+   "app_targets.json to follow OSK naming convention. It may also",
+   "contain definitions beyound the target apps",    
+   "Defines the FSW app targets to be available when OSK is runnning.",
+   "load-on-init determines whether app is loaded when OSK starts. Each",
+   "app has a json file that provides app details so this file simply",
+   "identifies apps and should not duplicate any information about an app."
+   ],
+   
+"targets": [
+
+   { "MM":      { "load-on-init": true  }},
+   { "KIT_CI":  { "load-on-init": true  }},
+   { "KIT_SCH": { "load-on-init": true  }},
+   { "KIT_TO":  { "load-on-init": true  }}
+   
+   ]
+}

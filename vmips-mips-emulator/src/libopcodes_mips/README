@@ -1,0 +1,4 @@
+This is the support code from libopcodes and libbfd that is used in VMIPS.
+It was taken from the versions of libopcodes and libbfd which were distributed
+as part of binutils-2.13.2.1.
+

@@ -1,0 +1,12 @@
+/exe/cpu1/cf/cfe_es_startup.scr
+/exe/cpu1/cf/kit_to_pkt_tbl.json
+/exe/cpu1/cf/kit_sch_msg_tbl.json
+/exe/cpu1/cf/kit_sch_sch_tbl.json
+/exe/cpu1/cf/osk_app_lib.so
+/exe/cpu1/cf/cfs_lib.so
+/exe/cpu1/cf/expat_lib.so
+/exe/cpu1/cf/kit_ci.so
+/exe/cpu1/cf/kit_sch.so
+/exe/cpu1/cf/kit_to.so
+/exe/cpu1/cf/mm.so
+/exe/cpu1/core-cpu1

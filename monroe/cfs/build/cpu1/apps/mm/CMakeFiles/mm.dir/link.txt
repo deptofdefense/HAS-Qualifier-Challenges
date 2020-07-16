@@ -1,0 +1,1 @@
+/usr/bin/gcc -fPIC -Wall -m32  -D_XOPEN_SOURCE=600    -g  -shared  -o mm.so CMakeFiles/mm.dir/fsw/src/mm_app.c.o CMakeFiles/mm.dir/fsw/src/mm_dump.c.o CMakeFiles/mm.dir/fsw/src/mm_load.c.o CMakeFiles/mm.dir/fsw/src/mm_mem16.c.o CMakeFiles/mm.dir/fsw/src/mm_mem32.c.o CMakeFiles/mm.dir/fsw/src/mm_mem8.c.o CMakeFiles/mm.dir/fsw/src/mm_utils.c.o 

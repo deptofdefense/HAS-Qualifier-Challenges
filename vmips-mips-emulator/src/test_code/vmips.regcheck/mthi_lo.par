@@ -1,0 +1,4 @@
+regcheck_set_results { \
+HI 00000123 \
+LO 00004567 \
+}

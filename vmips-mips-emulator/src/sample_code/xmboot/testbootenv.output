@@ -1,0 +1,39 @@
+printenv () produces:
+boot=
+console=*
+haltaction=h
+testaction=q
+systype=0x00020000
+getenv ("systype") == 0x00020000
+getenv ("crap") == NULL
+setenv ("crap", "50"):
+printenv () produces:
+boot=
+console=*
+haltaction=h
+testaction=q
+systype=0x00020000
+crap=50
+setenv ("haltaction", "cheese"):
+printenv () produces:
+boot=
+console=*
+haltaction=cheese
+testaction=q
+systype=0x00020000
+crap=50
+unsetenv ("console"):
+printenv () produces:
+boot=
+haltaction=cheese
+testaction=q
+systype=0x00020000
+crap=50
+unsetenv ("crap2"):
+Variable not found.
+printenv () produces:
+boot=
+haltaction=cheese
+testaction=q
+systype=0x00020000
+crap=50

@@ -1,0 +1,74 @@
+
+#
+# endian-test.exp
+#
+# This one tests for specific output patterns based on the target endianness.
+#
+
+load_lib vmips-misc.exp; misc_test_setup endian-test
+spawn -noecho $vmips -n -F /dev/null -o [vmips_endian_option] -o testdev \
+ -o noinstdump -o nobootmsg $romfile
+
+# big endian
+set big_endian { 0xaabbccdd 0xa1b20000 0x0000a1b2 0xc3000000 0x00c30000 0x0000c300 0x000000c3 }
+
+# little endian
+set little_endian { 0xaabbccdd 0x0000a1b2 0xa1b20000 0x000000c3 0x0000c300 0x00c30000 0xc3000000 }
+
+if {[vmips_target_endian] == "big"} {
+	set records $big_endian
+} else {
+	set records $little_endian
+}
+
+proc checkoutput {i rec got} {
+	global nwrong
+	global expect_out
+	if {$rec == $got} {
+		verbose "ok $i (expected $rec, got $got)"
+	} else {
+		verbose "WRONG $i (expected $rec, got $got)"
+		incr nwrong
+	}
+	set cooked [string trimright $expect_out(0,string) "\r\n"]
+	verbose "full output was: \"$cooked\""
+}
+
+set prefix "TestDev Store\\(0x00000000\\) "
+set nwrong 0
+
+for {set i 0} {$i < [llength $records]} {incr i} {
+	set rec [lindex $records $i]
+	expect { 
+		-re "^${prefix}got 0x\[0-9a-f\]+, storing (0x\[0-9a-f\]+)\r\n" {
+			checkoutput $i $rec $expect_out(1,string)
+		}
+		timeout {
+			verbose "abort $i -- $expect_out(buffer)";
+			fail $testcase;
+			return
+		} 
+		eof {
+			verbose "eof $i -- $expect_out(buffer)";
+			fail $testcase;
+			return
+		}
+	}
+}
+
+expect { 
+	-ex "BREAK instruction reached -- HALTING" { verbose "halted" } 
+	timeout { verbose "abort at end";  fail $testcase; return } 
+	eof     { verbose "eof at end";    fail $testcase; return }
+}
+
+if {$nwrong == 0} {
+	pass $testcase
+} else {
+	verbose "$nwrong wrong answers"
+	fail $testcase
+}
+
+close
+wait
+

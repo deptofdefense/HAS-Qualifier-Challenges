@@ -1,0 +1,33 @@
+Get all the necessary Code
+
+$ git clone <url/to/rtems.git>
+$ cd rtems
+$ git submodule update --init 
+
+Optional: If you want to build tools that incorporate an unaligned memory access instruction emulator as 
+a trap handler, include the following patch
+
+$ cd rtems5-base/rtems
+$ git am < ../0001-Added-Mem-Unaligned-Trap-handler.patch
+
+Building the following code takes a lot of time, but should only need to be built once. It is recommended
+that one machine build the image, and export it to the rest of the team using docker image save/load
+
+$ make rtems5-base
+
+Next, to build both i386 and SPARC gcc tool chains in one container (recommended, required for cFS)
+
+$ make rtems5-tools
+
+Alternatively to only build the SPARC gcc tool chains (NOT recommended, doesn't support later steps)
+
+$ make rtems5-tools-sparc
+
+To build additional tools for flashing the boards (do to evaluation license, we cannot distribute this!)
+
+$ make has_tools
+
+To add useful bash functions to your shell, source the board-tools/env.sh in your bashrc
+
+NOTE: This entire process takes a long time, and only the final has_tools is likely to be required 
+for most people. This file has been cached and is readily available on our internal file share.

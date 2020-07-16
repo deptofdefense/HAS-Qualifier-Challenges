@@ -1,0 +1,5 @@
+This challenge is primarily a RE challenge and a simple crypto exploit. Symbols were removed to increase difficulty but
+can be added back in without trivializing the challenge.
+The challenge tries to give bread crumbs of the protocol with the PCAP and it can also be used to perform a trivial 
+replay attack and a AES-CTR byte swap attack to change the system to the "undocumented" DEBUG mode that allows encryption
+to be disabled.

@@ -1,0 +1,12 @@
+2020-04-22T00:00:00Z sun_point
+2020-04-22T09:28:00Z imaging
+2020-04-22T09:35:00Z sun_point
+2020-04-22T10:47:00Z data_downlink
+2020-04-22T10:51:00Z sun_point
+2020-04-22T20:51:00Z wheel_desaturate
+2020-04-22T21:51:00Z sun_point
+2020-04-23T09:51:00Z imaging
+2020-04-23T09:58:00Z sun_point
+2020-04-23T11:10:00Z data_downlink
+2020-04-23T11:13:00Z sun_point
+run

@@ -1,0 +1,5 @@
+name = "request_flag_telemetry"
+executable = "req_flag_base.py"
+config = "/challenge/local_config.toml"
+version = "0.1"
+author = "ultron-browser"

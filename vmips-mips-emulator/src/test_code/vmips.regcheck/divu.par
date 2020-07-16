@@ -1,0 +1,4 @@
+regcheck_set_results { r10 00000000 \
+r11 ffffffff \
+r12 11111111 \
+r13 00000000 }

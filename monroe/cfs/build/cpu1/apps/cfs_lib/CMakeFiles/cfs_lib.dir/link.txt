@@ -1,0 +1,1 @@
+/usr/bin/gcc -fPIC -Wall -m32  -D_XOPEN_SOURCE=600    -g  -shared  -o cfs_lib.so CMakeFiles/cfs_lib.dir/fsw/src/cfs_utils.c.o 

@@ -1,0 +1,17 @@
+/* Auto-generated version information file */
+#define MISSION_CONFIG      "@MISSIONCONFIG@"
+#define MISSION_NAME        "@MISSION_NAME@"
+#define OPENSATKIT_VERSION "@MISSION_VERSION@"
+#define OSK_APP_FW_VERSION "@osk_app_fw_VERSION@"
+#define CFS_LIB_VERSION "@cfs_lib_VERSION@"
+#define EXPAT_LIB_VERSION "@expat_lib_VERSION@"
+#define KIT_CI_VERSION "@kit_ci_VERSION@"
+#define KIT_SCH_VERSION "@kit_sch_VERSION@"
+#define KIT_TO_VERSION "@kit_to_VERSION@"
+#define MM_VERSION "@mm_VERSION@"
+#define CFE_VERSION "@cfe-core_VERSION@"
+#define OSAL_VERSION "@osal_VERSION@"
+
+#define MISSION_VERSION OPENSATKIT_VERSION
+
+ /* end */

@@ -1,0 +1,13 @@
+SERVICES INFO
+[app-service.addr]             = 127.0.0.1:8000
+[scheduler-service.addr]       = 127.0.0.1:8010
+[sch-service.addr]             = 127.0.0.1:8110
+[tel-service] / "telemetry.db" = 127.0.0.1:8121
+[tel-service.addr]             = 127.0.0.1:8120
+[telemetry-service]            = 127.0.0.1:8021
+[telemetry-service.addr]       = 127.0.0.1:8020
+[file-transfer-service]        = 127.0.0.1:8080
+[file-transfer-service.addr]   = 127.0.0.1:8040
+[monitor-service.addr]         = 127.0.0.1:8030
+[shell-service.addr]           = 127.0.0.1:8050
+url: localhost:port/graphiql

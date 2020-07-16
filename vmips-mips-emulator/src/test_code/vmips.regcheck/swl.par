@@ -1,0 +1,14 @@
+# BUILD RULES: testcase_simple_asm -setup 1 swl
+if {[vmips_target_endian] == "little"} {
+ regcheck_set_results { \
+ r09  112233aa \
+ r10  1122aabb \
+ r11  11aabbcc \
+ r12  aabbccdd }
+} elseif {[vmips_target_endian] == "big"} {
+ regcheck_set_results { \
+ r09    aabbccdd \
+ r10    11aabbcc \
+ r11    1122aabb \
+ r12    112233aa }
+}

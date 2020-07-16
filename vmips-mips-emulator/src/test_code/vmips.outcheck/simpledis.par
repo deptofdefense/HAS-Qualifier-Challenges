@@ -1,0 +1,7 @@
+OPTIONS: -o nobootmsg -o instdump -o haltbreak
+EXPECTED OUTPUT FOLLOWS:
+PC=0xbfc00000 [1fc00000]	00641021 addu	v0,v1,a0
+PC=0xbfc00004 [1fc00004]	00c72823 subu	a1,a2,a3
+PC=0xbfc00008 [1fc00008]	01090019 multu	t0,t1
+PC=0xbfc0000c [1fc0000c]	0000000d break
+* BREAK instruction reached -- HALTING *

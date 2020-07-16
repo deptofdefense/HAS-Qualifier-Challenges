@@ -1,0 +1,5 @@
+name = "initial_tel_data"
+executable = "ins_initel.py"
+config = "/challenge/local_config.toml"
+version = "0.1"
+author = "hidden"

@@ -1,0 +1,3 @@
+OPTIONS: -asdfasdf
+BUILD RULES: testcase_empty
+GREP: Error: Unrecognized option -asdfasdf. Try .* --help

@@ -1,0 +1,29 @@
+# BUILD RULES: testcase_simple_asm -setup 1 cload
+if {[vmips_target_endian] == "little"} {
+
+    regcheck_set_results {
+	R10 ddabb2ed
+	R11 deadbeef
+	R12 deadbeef
+	R13 0000b0ec
+	R14 0000dfac
+	R15 0000b0ec
+	R16 000000ed
+	R17 000000b2
+	R18 000000ab
+	R19 000000dd
+    }
+} elseif {[vmips_target_endian] == "big"} {
+    regcheck_set_results {
+	R10 ddabb2ed
+	R11 deadbeef
+	R12 deadbeef
+	R13 0000dfac
+	R14 0000b0ec
+	R15 0000dfac
+	R16 000000dd
+	R17 000000ab
+	R18 000000b2
+	R19 000000ed
+    }
+}

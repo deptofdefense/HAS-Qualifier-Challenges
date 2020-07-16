@@ -1,0 +1,5 @@
+name = "low_power"
+executable = "low_power.py"
+config = "/challenge/local_config.toml"
+version = "0.1"
+author = "ultron-browser"

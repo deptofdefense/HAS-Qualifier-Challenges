@@ -1,0 +1,2 @@
+#!/bin/sh
+exec ../../vmips -o memsize=16M -o nohaltbreak -o dbemsg ${1+"$@"}

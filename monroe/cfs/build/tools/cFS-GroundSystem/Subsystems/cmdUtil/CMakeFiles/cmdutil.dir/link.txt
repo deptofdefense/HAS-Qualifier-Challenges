@@ -1,0 +1,1 @@
+/usr/bin/cc  -m32 -g  -rdynamic CMakeFiles/cmdutil.dir/cmdUtil.c.o CMakeFiles/cmdutil.dir/sendUdp.c.o  -o cmdutil 

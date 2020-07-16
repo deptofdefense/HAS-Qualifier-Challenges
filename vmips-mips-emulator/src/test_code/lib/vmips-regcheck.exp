@@ -1,0 +1,171 @@
+
+proc regcheck_abort {why} {
+	perror "Test aborted ($why)"
+	vmips_exit
+	exit 1
+}
+
+proc regcheck_set_xfail {targs} {
+	setup_xfail $targs
+}
+
+proc regcheck_set_options {optlist} {
+	global options
+	set options "$optlist"
+}
+
+proc regcheck_set_results {reglist} {
+	global results_ary
+	if [info exists results_ary] {
+		unset results_ary
+	}
+	array set results_ary $reglist
+	verbose "*** ALL RESULT NAMES: [array names results_ary]"
+    foreach name [array names results_ary] {
+		if [regexp "^(\[Rr\])(\[0-9\])$" $name dummy0 dummy1 rnum] {
+			verbose "*** FIXING UP ${dummy1}${rnum} to ${dummy1}0${rnum}"
+			set newname "${dummy1}0${rnum}"
+			set results_ary($newname) $results_ary($name)
+			unset results_ary($name)
+		} else {
+			set newname $name
+		}
+		verbose "*** RESULT $newname SHOULD BE $results_ary($newname)"
+	}
+}
+
+proc regcheck_parse_reg_dump {} {
+    global regs
+	global comp_output
+    # Get rid of any already-existing register dump parse results.
+    if [info exists regs] {
+        unset regs
+    }
+
+	set regdumpstart 0
+	set regdumpend 0
+	while {!$regdumpend && [string length $comp_output] > 0} {
+		#
+		# Get the first line from $comp_output into $line,
+		# and delete it from $comp_output.
+		#
+		set line [string range $comp_output 0 [string first "\n" $comp_output]]
+		set comp_output [string range $comp_output \
+							[expr 1 + [string first "\n" $comp_output]] \
+							[string length $comp_output]]
+		#
+		# Look for the beginning of the register dump.
+		#
+		if [regsub "^.*Reg Dump: \\\[" $line "" lineout] {
+			incr regdumpstart
+		} else {
+			set lineout $line
+		}
+		#
+		# Look for error messages.
+		#
+		if [regexp "^Error:.*" $line errmsg] {
+			warning $errmsg
+		}
+		#
+		# If we found the beginning of the register dump,
+		# then look for whitespace-separated tokens within it.
+		#
+		if {$regdumpstart} {
+			foreach token $lineout {
+				if {$token == "\]"} {
+					#
+					# If we found a right bracket, that marks the
+					# end of the register dump, and we can stop parsing.
+					#
+					set regdumpstart 0
+					set regdumpend 1
+				} elseif [regexp "(\[A-Za-z0-9\]+)=(\[A-Za-z0-9\]+)" \
+							$token subtoken reg val] {
+					#
+					# If we matched something that looks like an assignment
+					# statement, then we store the lhs and rhs in the regs
+					# array.
+					#
+					verbose "*** REGS($reg) <= $val"
+					set reg [string tolower $reg]
+					set regs($reg) [string tolower $val]
+				}
+			}
+		}
+	}
+}
+
+# Check the results of a regcheck test.
+proc regcheck_check_results {} {
+    global results_ary
+	global regs
+    set match_fail 0
+
+	# Look at each of the expected results in the `results_ary' array.
+	# Compare each one against the corresponding entry in the `regs'
+	# array.
+    foreach name [array names results_ary] {
+        set lname [string tolower $name]
+        verbose "*** Checking $lname"
+        set rval [string tolower $results_ary($name)]
+		if ![info exists regs($lname)] {
+			warning "Register $lname not found in reg dump!"
+            incr match_fail
+		} else {
+			if {$regs($lname) == $rval} {
+				verbose "*** Register $lname matches expected result"
+			} else {
+				verbose "*** Register $lname does not match expected result"
+				verbose "*** Got $regs($lname), expected $rval"
+				incr match_fail
+			}
+		}
+    }
+	return $match_fail
+}    
+
+proc regcheck_run_one_test {testparams} {
+	# Set the default options.
+	global timeout
+	global options
+	clear_xfail
+	set timeout [vmips_default_timeout]
+	set options ""
+	set default_options "-o noinstdump -o nobootmsg -o haltbreak -o haltdumpcpu"
+	set testrom [vmips_get_romfile_name $testparams]
+	vmips_build_romfile $testrom
+
+	# Load testcase-specific parameters: including expected final,
+	# register values, loaded into `results_ary', and any special
+	# options required, loaded into `options'.
+	if [file exists $testparams] {
+		source $testparams
+	} else {
+		perror "Can't load params from $testparams"
+	}
+
+	# Incorporate any testcase-specific options.
+	set all_options "$default_options"
+	if [info exists options] {
+		set all_options "$options $all_options"
+	}
+	
+	# Start the simulator.
+	set commandline "$all_options $testrom"
+	vmips_start $commandline
+
+	# Analyze the output, creating the `regs' array.
+	regcheck_parse_reg_dump
+
+	# Check against the expected results.
+	set nfails [regcheck_check_results]
+	if {$nfails > 0} {
+		fail $testparams
+	} else {
+		pass $testparams
+	}
+
+	# Stop the simulator.
+	vmips_exit
+}

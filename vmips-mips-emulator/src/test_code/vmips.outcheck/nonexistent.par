@@ -1,0 +1,3 @@
+OPTIONS: -o nobootmsg
+BUILD RULES: testcase_empty
+GREP: Error: Could not open ROM `.*': .*

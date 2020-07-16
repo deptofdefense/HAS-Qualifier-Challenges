@@ -1,0 +1,412 @@
+Pi3D Change Log
+===============
+Tim Skillman, Patrick Gaunt, Tom Ritchford
+
+Date        Amends
+
+v2.34
+2019-11-16  Bug fix: move the changes in fragment shaders into the include file in
+            pi3d so minimise breaking shaders in pi3d_demos.
+
+v2.33
+2019-11-13  Improvement: use_glx argument for Display.create() allows X windows
+            to have transparent backgrounds. EGL function call arguments and
+            return types have been made more explicit. The shaders now have a
+            mechanism to convert the code into a form compatible with GL2.1,
+            GLES2.0 and GLES3.0 Display.create() detects the OpenGL/ES type and
+            version and saves this in Display.opengl.gl_id
+            This will probably be the last v2 release. v3 will use SDL2 as the
+            default window system rather than X directly. bcm will still be
+            enabled for Raspberry Pi without X desktop running.
+
+v2.32
+2019-07-22  Bug fix: points and lines now render on RPi4 along with utilities
+            that relied on this.
+            Improvement: The setting of the front face of the polygons to be
+            defined as clockwise now makes it clearer that the backs of faces
+            are culled by default. Also the OpenGL function call arguments have
+            been explicitly made using ctypes aliases to avoid confusion.
+
+v2.31
+2019-06-25  Improvement: Checking for new GL driver now not dependent on
+            glxinfo (mesa-utils)
+
+v2.30
+2019-06-24  Bug fix: New version of Raspbian no longer supports broadcom bcm_host
+            GL driver which is now detected and correct drivers loaded.
+            Improvement: x11 window name facility added. Billboard functionality
+            added to MergeShape
+
+v2.29
+2019-01-19  Improvement: Display.change_layer() function added and the layer
+            ref held in Display instance. This allows Display.resize() to work
+            correctly. Font now has grid_size argument to allow a smaller number
+            of larger format characters.
+
+v2.28
+2018-10-12  Improvement: The model loader for wavefront obj files now doesn't
+            load duplicate vertices as it would have to if glDrawArrays was
+            being used for rendering. glDrawElements is supposed to be faster
+            but the change is not measurable. It will reduce GPU memory by about
+            half.
+
+v2.27 - no change from 2.26
+v2.26
+2018-07-29  Bug fix: Error (probably harmless) due to glEnable being used
+            with invalid GL_TEXTURE_2D argument.
+            Improvements: Phong type brightening added to uv and mat _reflect
+            shaders. Built-in mix() function used in fragment shaders (as opposed
+            to DIY formula). Places where import * used converted to explicitly
+            import the required tokens.
+
+v2.25
+2018-04-29  Bug fix: TextBlockColour.set_colour() not updating blue or alpha
+            values. Additional argument to Tube to allow it to not use
+            Shape._lathe() but make cylindrical uv mapping on outside and
+            inside and flat uv mapping on top and bottom. 
+
+v2.24
+2018-04-09  Bug fix: Shape.rotate_to_direction() could occasionally not
+            work in python2
+
+v2.23
+2018-03-29  Bug fix: Camera.matrix_from_two_vectors() was mispelt, now has
+            alias from wrong spelling for backwards compatibility. Logging
+            gives reason for assertion failure if trying to do opengles
+            function not on main thread.
+            Improvements: Shape has utility functions rotate_to_direction()
+            transform_direction() and shallow_clone() allowing easier
+            manipulation of articulated parent-child arrangements.
+
+v2.22
+2017-11-09  Improvements: Slight speed improvements for PexParticles,
+            util/Graph class handles some work of creating fast graphs,
+            fog start distance can be controlled, MergeShape can create
+            multiple Buffers each with different draw properties.
+
+v2.21
+2017-09-05  Bug fixes: Rasbian stretch has renamed libGLES and libEGL so
+            this is now checked for in constants/__init__.py A change in
+            ctypes.WinDLL between python 2.7.12 and 2.7.13 means unicode
+            arguments have to be converted to str (patched back for 2.7.14!)
+            Improvements: Setting up Shape rotation matrix flags tidier.
+            properties Shape.xyz rxryrz sxsysz cxcycz added with setters
+            and getters.
+
+v2.20
+2017-07-27  Bug fixes: Removed use of numpy functions not yet available
+            in numpypy (pypy version). Some corrections of Log. Removal
+            of ctypes.byref() where passing an array (as already a pointer).
+            Some out of memory checking in Buffer.
+v2.19
+2017-04-20  Improvements: Multiple Textures can be used for ElevationMap,
+            Texture flip can do vertical, horizontal or both.
+            Bug fixes: event system limit of four devices in category kbd,
+            mouse or js increased to sixteen as it's possible to exceed
+            previous limit.
+
+v2.18
+2017-02-16  Improvements: Shadow system for Font and FixedString to allow
+            text to show up against variable backgrounds. Effectively adds
+            an outline.
+
+v2.17
+2017-01-24  Bug fixes: Logging system altered quite significantly. Within
+            the pi3d module logging is done using the 'vanilla' python
+            logging.getLogger(__name__) rather than the pi3d.Log system.
+            The handler is explicitly kept track of rather than letting
+            the basicConfig function generate a (potentially) duplicate
+            handler. Unfortunately this change will break existing code
+            that uses pi3d.Log
+
+v2.16
+2016-12-06  Bug fixes: pkg_resources.resource_string used for loading
+            shader instead (as well as) reading from file path. Handling
+            of detatched event streams. Context manager for Keyboard. Fix
+            for untextured Buffer.draw(). Wholesale specification of arg 
+            and return types for egl and gles ctypes functions in attempt
+            to fix new intermittent bug when running on windows (failed to fix)
+            
+            Improvements: PexParticles class added allowing pex files to
+            be read for rendering 2D particle effects using Points.
+
+v2.15
+2016-10-13  Bug fixes: Blending fonts with background pixels now doesn't
+            give darkening effect.
+
+v2.14
+2016-10-07  Improvements: Can be used without install PIL using compressed
+            numpy arrays for images. FixedString BUMP filter uses same code
+            as normal_map in Texture which also allows +ve or -ve factor
+            values
+
+v2.13
+2016-07-30  Bug fixes: windows 64 bit now works after specifying argument
+            types for ctypes functions for libEGL.dll. NB only the functions
+            that caused an error in RunTests were fixed so there could be 
+            instances in future where others come back to bite.
+
+            Improvements: Camera now has an ``absolute=True`` argument (and
+            settable attribute) that determines whether rotations are done
+            relative to the starting rotation (determined by ``eye`` and ``at``
+            position vectors) or relative to the position the Camera is
+            currently rotated to. There is also an ``offset`` method that
+            allows Camera translation before rotation so the Camera behaves
+            in a similar way to the Shape system with matrix multiplicaiton
+            delayed until the first Shape.draw() There are also convenience
+            methods for calculating euler angles and correction rotations.
+
+v2.12
+2016-06-29  Bug fixes: hacked six module renamed to six_mod to avoid conflict.
+            Checking if samples can be used (can't with ANGLE on windows)
+            using try block. Rendering OffscreenTexture onto background with
+            alpha 1.0 now doesn't become transparrent.
+
+            Improvements: Buffer stores element_normals as well as smoothed
+            normals for quicker use in ElevationMap, in which class methods generally 
+            improved to use numpy more efficiently and allow maps to be created
+            with non-uniform vertices (TODO: nothing actually does this yet).
+            Method in Texture allows normal image to be converted into a
+            normal map where luminance is used as height.
+
+v2.11
+2016-04-25  Improvements: screenshot() can be used to capture rendered
+            image to a numpy array (and not written to file) for use with
+            gtk or pyqt display for instance. More control over window features
+            when using pygame, thanks to @crashmatt (who did the creative
+            work for PointText and TextBlock in v2.8)
+
+v2.10
+2016-02-11  Bug fixes: GL_STENCIL_SIZE explicitly set in DisplayOpenGL
+            Mouse wheel movement doesn't crash when using pygame input -
+            and is available within pi3d.
+            Improvements: Various enhancements using different images as
+            textures allowing image types: GL_ALPHA, GL_LUMINANCE,
+            GL_LUMINANCE_ALPHA, GL_RGB and GL_RGBA the most appropriate
+            setting will be chosen from the file type or it can be overridden
+            by an argument to the Texture.__init__() Also the mipmap code
+            has been moved to the correct location to drastically reduce
+            memory requirements with the mipmap=False. Thanks to @swehner for
+            all his work on this
+
+v2.9
+2016-01-16  Bug fixes: glReadPixels fixed on linux and windows so Screenshot 
+            and ClashTest work. glBufferData ctypes pointer fixed explicitly 
+            to c_float allows large buffers to work.
+            Improvements: Optionally use setuptools, Mouse button more useful.
+            Options to free numpy array after image loaded, to use different 
+            dispmanx layers and use different texture formats (apart from 
+            GL_RGB and GL_RGBA), xbox event structure fix, X11 keyboard 
+            release events stored.
+
+v2.8
+2015-11-07  some overdue, significant improvements to the way the light 
+            vector is mapped to the plane of the tangent and cotangent vectors. 
+            (needed for normal map effect). fixes to the Mouse and Keyboard 
+            classes to make behaviour more similar across platforms Matt's 
+            FastText and TextBlock classes and the uv_pointsprite shader
+            mods to the Font class so it can work either with the FastTest 
+            or String classes following Peter Farrell's suggestion, a method 
+            in Camera that does the reset() rotate() and position() and 
+            returns the new location for a Camera moving over an ElevationMap 
+            taking into account surface steepness.
+
+v2.7
+2015-08-14  Much improved shadow casting using depth mapping to OffScreenTexture.
+            Shape.lathe() patched so normal on first leg of path realistic,
+            also edges of shapes redefined in elements so line drawing
+            generally produces quads rather than triangles. Also texture
+            mapping in lathe corrected to use distance along path rather
+            than y position. Texture reflection in shaders fixed. Normals
+            in String fixed. Option to use pygame rather than X11 display,
+            mouse and keyboard to avoid having to run as root on linux.
+
+v2.6
+2015-07-02  Moved Shader specific code from Shape.draw() to Buffer.draw()
+            to allow different Shaders on parts of same shape. MergeShape
+            uses faster numpy RotateVec and copies other parts of Buffer
+            as well as arrays.
+
+v2.5
+2015-06-07  better loading of alternative shared objects i.e. for ubuntu MATE
+            StereoCam added.
+v2.4
+2015-06-06  some bug fixes w.r.t
+            init on ubuntu MATE
+v2.3
+2015-06-04  ubuntu MATE has different copies of EGL and GLESv2
+            also pygame needs closing on some windows systems
+
+v2.2
+2015-05-23  Windows dll requirement clarified. Keyboard on windows returns
+            same codes as X11 (more or less)
+
+v2.1
+2015-05-09  Texture.__init__ now copes with numpy array and a method has
+            been added to make only the required opengles function calls
+            for each texture change. This will now produce reasonable
+            video textues. Some fixes to running on windows for mouse and
+            tk argument to display creation.
+
+v2.0
+2015-04-28  Runs on windows using pygame and ANGLE dll files. Some speed
+            increases, use of numpy arrays in Camera, much better
+            reflection shader. 
+
+v1.14
+2015-03-19  Fairly major change in the way python array data is passed to
+            libGLESv2 functions. Now generally uses ndarray.ctypes.data
+            rather than expanding values and creating a new ctypes array.
+            Lines class and line drawing added. anti-alias defaults off
+            as it breaks pi3d on vmware. Mouse option to use x11 pointer
+            as standard Mouse doesn't work on vmware. 
+
+v1.13
+2015-02-05  Importable to Android using python-for-android. Mouse buttons
+            and thread stopping on program close. EGL anti-aliasing.
+            Texture pickling fixed.
+
+v1.12
+2014-12-22  Light can be defined as originating from a point. Shaders can
+            use #include to reduce duplication of code
+            
+v1.11
+2014-11-24  bug fix PIL.Image.tobytes() does not work with the old python-
+            imaging. Texture can be passed an Image object instead of a
+            string path to an image file.
+            
+v1.10
+2014-10-21  scenery functionality bug fixes.a utility class has been added
+            for background loading scenery as elevation maps and mergegroups.
+            Elevationmap.calcheight fixed and provides optional return of
+            normal vector. Shaders downgraded to consistant medium precesion
+            as this is limited on some platforms.
+
+v1.9
+2014-08-02  minor fixes pypi status moved to stable. String.quick_change
+            allows change of text without creating new String object
+
+v1.8
+2014-04-23  various fixes and enhancements. uv_reflect and mat_reflect
+            shaders now map reflected image correctly. Shapes have a list
+            of children that inherit transformations (i.e. finger child
+            of hand <- forearm <- upper-arm <- body etc) Sphere has argument
+            invert that makes normals face in for use as environment. More
+            flexible loading of wavefront obj files. Large sprites can be
+            made using an array of textures.
+
+v1.7
+2014-01-20  Minor fixes.
+
+v1.6
+2013-12-05  Simple GUI functionality. Minimal fixes. pi3d.util.Gui added
+
+v1.5
+2013-11-25  Bug fixes. InputEvents now works with python3. Buffer uses numpy
+            to calculate normals which would be much faster if this were
+            ever required for a large array of vertices.
+
+v1.4
+2013-10-16  Minor improvements and bug fixes. Camera init uses dimensions
+            from Display (as the default instance Camera did) rather than
+            guessing! Buffer now copes with intentionally missing normals
+            and texture coordinates as would often be the case for drawing
+            points or drawing a Model using self colour (and no texture OR
+            bump mapping) Pillow has now been correctly fixed but the
+            horrible fixes to get round the previous version will be left
+            in for a while.
+
+v1.3
+2013-09-19  Memory leak with Textures reappeared and fixed. Bug in Pillow
+            looks like it will not be fixed for 2.2.0 so added a hack to
+            Font. LodSprite allows segmentation of a simple plane for
+            texture sampling in the vertex shader. Additional Textures can
+            be passed to PostProcess __init__ for use by filter shaders.
+            Additional filters added to pi3d_demos
+
+v1.2
+2013-09-06  PostProcess added to allow effect shaders to be applied to
+            a rendered scene. OffScreenTexture system streamlined to take
+            out duplicated code and now works on X11 systems.
+
+v1.1
+2013-08-25  Split demos into their own repository and make pi3d structure
+            more in line with other packages. Put package on pypi to allow
+            installation using 'python setup.py install' or, ideally,
+            'pip install pi3d'
+
+v1.0
+2013-08-16  Support for other linux platforms using xlib and mesa. Runs under
+            python3 using six. Memory leaks fixed. Unicode, multiline and justified
+            String. DogFight demo using multiplayer networking (urllib to
+            MySQL php server) Point rendering option added. Shadow casting
+            onto ElevationMap. MergeShape takes array of Shapes so much
+            quicker for assemblies of large numbers of objects. Slideshow
+            demo loads resources in background thread. Fixed z position
+            bug in 2d_flat/Canvas system. Added alpha value as a uniform
+            variable to allow shaders to fade objects.
+
+v0.8
+2013-05-29  Switch to a non-zero-padded version number
+
+v0.08
+2013-02-08  Wholesale conversion to OpenGL ES2.0 mechanisms. As much as possible
+            of the existing functionality has been maintained though some classes
+            have not yet been implemented: [collisionMap, Missile] some are done
+            differently: [Draw, DrawString2D] The structure of the module has been
+            broken into a directory structure with smaller files generally containing
+            one class. Shaders implemented, Display class does more loop control,
+            file loading can be done on sub threads, TTF fonts can be used events
+            can handle all types of input such as joystick, gamepad etc, Building
+2012-12-08  class and clashtest shader detect bumping into things.
+
+v0.07
+2012-12-08  Added splash screen to TK window (also user defineable)
+2012-12-07  LoaderEgg draw needed to disableClientState(GL_COLOR_ARRAY) as
+            this affected the scene afterwards
+2012-12-07  Added pi3d.FPS class that returns a Frames Per Second (FPS) count
+2012-12-06  Found a problem with matrix stacking - a push would increase the
+            stack but a pop would not reduce it (i.e. constantly increasing)
+            Introduced a fixed stack method with a default of 20 deep pushes
+            (or user defined, e.g. mtrx=pi3d.matrix(50) for fifty pushes)
+            This should also speed things up a little as stack is pre-allocated
+            upon intialisation.
+2012-12-06  Separated perspective and orthographic code into setPerspective and
+            setOrthographic functions so that a scene can interchange between them
+
+v0.06
+2012-11-29  Added Pi3D.DrawString2D which now renders text to a 2D orthographic view
+2012-11-29  Added Pi3D.CollisionMap for checking collisions against objects.
+            Includes a collideLine method to see if a line of fire will hit an object
+2012-11-28  Pi3D.LodDraw3 and LodDraw3xyz added to enable Level Of Detail rendering
+            for near, far and further models (or none at all) 
+2012-11-27  Loading textures checks for duplicates and uses preloaded textures
+            rather than loads them again
+2012-11-26  Drawing models (LoadModel) can use offset,rotation,scale and centre
+            values added to their draw call (skips a matrix calculation)
+2012-11-18  Modified loadECfiles to support other image types and an option not to
+            render the bottom image
+2012-11-17  Added Pi3D.tkwin class for creating and handling TKinter window and events.
+            Much improved keyboard and mouse handling
+2012-11-17  Modified Pi3D display class to resize the viewport and destroy correctly.
+            Includes a seperate method to create_surface
+2012-11-17  Adopted Paddy Gaunt's fixes and additions to Pi3D module including
+            LoadModel (Obj format) and ClashTest
+
+v0.05
+2012-07-20  Add textures class so that textures can be deleted correctly
+2012-07-20  Fixed a couple of bugs with latest release of Raspbian Wheezy
+2012-07-12  Amended mergeShape to include shape's existing parameters
+            (x,y,z,rotations, scale)
+2012-07-12  Added Paddy's fog effect
+2012-07-12  ForestWalk2.py - I broke it Paddy! - left tiled texture in
+2012-07-12  Modified ForestWalk.py to include new FACES type environment cube
+2012-07-12  Added loadECfiles def in Pi3D to help load faces textures for
+            environment cube (FACES type)
+2012-07-12  Made robotWalkabout.py that demostrates avatar viewing with an
+            offset camera
+2012-07-12  Swapped height and depth parameters in pi3d.createCuboid - was
+            confusing with x,y,z ordering
+2012-07-12  Updated clouds3d.py with Paddy's improved z-sorted version
+2012-07-12  Added more environment cubes (FACES, HALFCROSS, CROSS) and added
+            Github Wiki page

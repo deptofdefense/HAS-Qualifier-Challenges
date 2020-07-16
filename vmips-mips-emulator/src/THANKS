@@ -1,0 +1,34 @@
+
+Acknowledgements
+----------------
+
+ Conversations I had with Michael Constant <mconst at csua.berkeley.edu>
+ provided me with the initial impetus for writing the emulator.
+ My experience in Computer Science 61C at UC Berkeley helped to reinforce
+ my convictions in the matter. ;-)
+
+ I looked to James Larus's <larus at microsoft.com> SPIM simulator, to
+ which I have also been a code contributor, for examples of what to do
+ (and sometimes, what not to do) when faced with certain tricky issues.
+
+ Galen Hancock <galen at csua.berkeley.edu> has provided some patches.
+
+ Paul Twohey <twohey at csua.berkeley.edu> has provided several major patches,
+ and has generously tested new versions of VMIPS as they are released,
+ on various architectures. He has filed many insightful bug reports and
+ also provided MIPS tools for Mac OS X.
+
+ Steve Tu <sktu at ocf.berkeley.edu> contributed a rewrite of the CPU core
+ inner loop.
+
+ Sanjeev Datla <sanjeev_datla at hotmail.com> has done some testing and
+ contributed fixes for TLB bugs.
+
+ Chen Mingyu <cmy at ict.ac.cn> found two bugs in the TLB emulation.
+
+ Vladimir Machulsky <bofhmail at yahoo.com> found a bug in the debugger
+ interface.
+
+ Thanks to everyone else who has gotten in touch with me over the years
+ about their experiences using VMIPS.  Your feedback makes a difference!
+

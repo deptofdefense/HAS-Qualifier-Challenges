@@ -1,0 +1,30 @@
+[command]
+cmd_port = 4321
+apid = 999
+
+[payload]
+ip = "127.0.0.1"
+port = 4444
+wakeup_interval = 1
+poll_interval = 5
+apid = 110
+
+[flag]
+ip = "127.0.0.1"
+port = 5555
+apid = 100
+wakeup_interval = 1
+poll_interval = 100
+auth_key = "sovrysecur3"
+
+[telemetry]
+ip = "127.0.0.1"
+port = 6666
+apid = 107
+wakeup_interval = 1
+poll_interval = 2
+
+[housekeeping]
+wakeup_interval = 1
+poll_interval = 20
+apid = 106

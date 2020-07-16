@@ -1,0 +1,1 @@
+/usr/bin/gcc -fPIC -Wall -m32  -D_XOPEN_SOURCE=600    -g  -shared  -o expat_lib.so CMakeFiles/expat_lib.dir/fsw/src/expat_init.c.o CMakeFiles/expat_lib.dir/fsw/src/xmlparse.c.o CMakeFiles/expat_lib.dir/fsw/src/xmlrole.c.o CMakeFiles/expat_lib.dir/fsw/src/xmltok.c.o CMakeFiles/expat_lib.dir/fsw/src/xmltok_impl.c.o CMakeFiles/expat_lib.dir/fsw/src/xmltok_ns.c.o 

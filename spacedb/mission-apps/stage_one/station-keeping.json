@@ -1,0 +1,27 @@
+{
+    "tasks": [
+        {
+            "description": "Update system telemetry",
+            "delay": "35s",
+            "period": "1m",
+            "app": {
+                "name": "update_tel"
+            }
+        },
+        {
+            "description": "Trigger safemode on critical telemetry values",
+            "delay": "5s",
+            "period": "5s",
+            "app": {
+                "name": "critical_tel_check"
+            }
+        },
+        {
+            "description": "Prints flag to log",
+            "delay": "0s",
+            "app": {
+                "name": "request_flag_telemetry"
+            }
+        }
+    ]
+}

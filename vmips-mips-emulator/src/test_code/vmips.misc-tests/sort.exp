@@ -1,0 +1,104 @@
+
+#
+# sort.exp
+#
+# This one is tricky because we have to read in a memdump.bin file
+# and verify the correctness of its contents.
+#
+
+proc verify_sorted_list_in_memdump {filename count sizeof_int} {
+	#
+	# Read in the list
+	#
+	if [catch {open $filename "r"} chan] {
+		warning "opening $filename: $chan"
+		return -1
+	}
+	fconfigure $chan -translation binary
+	set inp [read $chan [expr $count * $sizeof_int]]
+	close $chan
+	#
+	# Translate it from binary integers to an ASCII list
+	#
+	if {[vmips_target_endian] == "big"} {
+		set format "I"
+	} else {
+		set format "i"
+	}
+	binary scan "$inp" "$format$count" list 
+	set list_length [llength $list]
+	verbose "Read in list ($list_length entries)"
+	#
+	# Sort the list
+	#
+	set sortedlist [lsort -integer $list]
+	set sortedlist_length [llength $sortedlist]
+	verbose "Sorted list (now $sortedlist_length entries)"
+	#
+	# See if the two are the same
+	#
+	if {$list_length != $sortedlist_length} {
+		verbose "Test fails: lists of different length after sort"
+		return -1
+	} else {
+		if {$list == $sortedlist} {
+			verbose "The list is in order"
+			return 0
+		} else {
+			verbose "The list is not in order"
+			for {set i 0} {$i < $list_length} {incr i} {
+				set list_entry [lindex $list $i]
+				set sortedlist_entry [lindex $sortedlist $i]
+				if {$list_entry != $sortedlist_entry} {
+					verbose "Diff at index $i: $list_entry != $sortedlist_entry"
+				}
+			}
+			return -1
+		}
+	}
+}
+
+#
+# Set some basic parameters.
+#
+load_lib vmips-misc.exp; misc_test_setup sort
+set memdump "memdump.bin"
+#
+# Number of integers to look for and the size of each one:
+#
+set count 128
+set sizeofint 4
+
+#
+# Run vmips on the sort ROM.
+#
+vmips_start "-o nobootmsg -o memdump -o noinstdump $romfile"
+
+#
+# Make sure we get the output we wanted.
+#
+if {$comp_output != "* BREAK instruction reached -- HALTING *\nDumping RAM to memdump.bin...succeeded.\n"} {
+	verbose "The output looked strange when we ran it:\n"
+	verbose "<$comp_output>\n"
+	fail $testcase
+} else {
+	if ![file exists $memdump] {
+		verbose "Memdump file $memdump didn't exist after run."
+		fail $testcase
+	} else {
+		#
+		# Verify the output.
+		#
+		set result [verify_sorted_list_in_memdump $memdump $count $sizeofint]
+		if {$result != 0} {
+			fail $testcase
+		} else {
+			pass $testcase
+		}
+	}
+}
+
+#
+# Clean up (remove the memdump file.)
+#
+file delete $memdump

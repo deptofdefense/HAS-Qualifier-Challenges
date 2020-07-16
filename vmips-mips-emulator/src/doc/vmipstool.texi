@@ -1,0 +1,126 @@
+@c %**start of header
+@c This is for the man page:
+@setfilename vmipstool.info
+@settitle VMIPS front end for common programming tasks.
+@c %**end of header
+
+@ignore
+@c man begin SEEALSO
+vmips(1), as(1), ld(1), gdb(1), 
+and the Info entries for @file{gcc}, @file{as},
+@file{ld}, @file{binutils} and @file{gdb}.
+@c man end
+@c man begin BUGS
+For instructions on reporting bugs, see
+the "Reporting Bugs" appendix of the Info manual.
+@c man end
+@c man begin AUTHOR
+vmipstool was written by Brian Gaeke.
+@c man end
+@c man begin COPYRIGHT
+@include copyright.texi
+@c man end
+@end ignore
+
+@node Invoking vmipstool, Programming, Customizing, Top
+@chapter Invoking vmipstool
+
+@c man begin DESCRIPTION
+@command{vmipstool} is intended to be a friendly front-end to the process
+of compiling, linking, and assembling code for VMIPS using the GNU Compiler
+Collection (GCC) and GNU Binutils.
+
+Note that you do not need to use @command{vmipstool}, or even GCC, to compile
+programs for VMIPS; you can use any MIPS compiler and assembler you have handy.
+@c man end
+
+The format of the vmipstool command line is as follows:
+
+@c man begin SYNOPSIS
+@example
+vmipstool [ --verbose ] [ --dry-run ] --compile [ FLAGS ]
+    FILE.c -o FILE.o
+vmipstool [ --verbose ] [ --dry-run ] --preprocess [ FLAGS ] FILE
+vmipstool [ --verbose ] [ --dry-run ] --assemble [ FLAGS ]
+    FILE.s -o FILE.o
+vmipstool [ --verbose ] [ --dry-run ] [ --ld-script=T ] --link
+    [ FLAGS ] FILE1.o ... FILEn.o -o PROG
+vmipstool [ --verbose ] [ --dry-run ] --make-rom PROG PROG.rom
+vmipstool [ --verbose ] [ --dry-run ] --disassemble-rom PROG.rom
+vmipstool [ --verbose ] [ --dry-run ] --disassemble-word PC INSTR
+vmipstool [ --verbose ] [ --dry-run ] --disassemble PROG (or FILE.o)
+vmipstool [ --verbose ] [ --dry-run ] --swap-words INPUT OUTPUT
+vmipstool --help
+vmipstool --version
+@end example
+@c man end
+
+@c man begin OPTIONS
+This is what the different command line options mean:
+
+@table @samp
+@item --help
+Display this help message and exit.
+
+@item --version
+Display the version of vmipstool and exit.
+
+@item --verbose
+Echo commands as they are run.
+
+@item --dry-run
+Don't actually run anything; use with --verbose.
+
+@item --ld-script=T
+Use T as the linker script (instead of default script); use with --link.
+
+@item --compile
+Compile C code.  The remainder of the command   
+line must consist of arguments to the GNU C compiler.
+
+@item --preprocess
+Preprocess C source code or assembly code. The remainder of the command   
+line must consist of arguments to the GNU C preprocessor.
+
+@item --assemble
+Translate assembly code to object files. The remainder of the command   
+line must consist of arguments to the GNU assembler.
+
+@item --link
+Link objects together to create an executable. The remainder of the command
+line must consist of arguments to the GNU linker.
+
+@item --make-rom
+Write a program into a ROM file. The next 2 arguments are the executable and
+the ROM file, respectively. 
+
+@item --disassemble
+Disassemble a relocatable object file (*.o file) or an executable.
+
+@item --disassemble-rom
+Disassemble arbitrary data, possibly including ROM files. (More
+information is available with --disassemble, but it only works on programs
+which have not been written into ROMs.)
+
+@item --disassemble-word
+Disassemble an instruction whose binary encoding is passed as a command-line
+argument. Because instructions can have PC-relative immediate arguments, the
+PC must also be specified.
+
+@item --swap-words
+Copy the input file to the output file, reversing the byte-order of each
+32-bit word in the process. This can be used to translate chunks of data
+from big-endian to little-endian, or vice-versa.
+
+@end table
+@c man end
+
+@c man begin FILES
+Note that @command{vmipstool} consults your @file{/etc/vmipsrc} and
+@file{~/.vmipsrc} to determine where the MIPS cross compiler, assembler,
+and @command{objdump} and @command{objcopy} tools are.  If you install new
+cross-tools, you should edit these configuration files to reflect the new
+location of the MIPS tools, and to reflect their default endianness, by
+changing the settings of @option{mipstoolprefix} and @option{bigendian}.
+@c man end
+

@@ -1,0 +1,99 @@
+
+#
+# Returns the filename of the vmips binary we are supposed
+# to be using.
+#
+proc vmips_tool_exec_name {} {
+    global objdir
+    if [info exists objdir] {
+        set vmips "$objdir/../vmips"
+        if ![file exists $vmips] {
+            perror "Can't find vmips in $vmips"
+        } else {
+            return $vmips
+        }
+    } else {
+        perror "objdir is not set"
+        return ""
+    }
+}
+
+proc vmips_endian_option {} {
+    if {[vmips_target_endian] == "little"} {
+        return "nobigendian"
+    } else {
+        return "bigendian"
+    }
+}
+
+#
+# Start vmips with the specified COMMANDLINE.
+# Disables the reading of system-wide and user-specific config files.
+# The user is expected to have set a global timeout.
+# Returns zero if the test case completed within the timeout, or
+# negative if it did not.
+# As a side effect, sets global variable COMP_OUTPUT
+# to the output from running vmips.
+#
+proc vmips_start {commandline} {
+    global comp_output spawn_id objdir
+    set vmips [vmips_tool_exec_name]
+    # Do not read config files - use defaults only.
+    set commandline "-n -F $objdir/../vmipsrc -o [vmips_endian_option] $commandline"
+    verbose "*** RUNNING $vmips $commandline"
+    #
+    # This is a mess because exec throws an error if the command fails,
+    # and we want to get stdout _and_ stderr from the command. Exec
+    # unfortunately isn't smart enough to handle this, so we have to
+    # spawn a shell.
+    #
+    # This was the old way to do it:
+    # set comp_output [exec -- sh -c "$vmips $commandline 2>&1 || true"]
+    #
+    # But, alas, this did not account for things that vmips prints to
+    # /dev/tty, which we'd dearly like to have included in the parseable
+    # output.
+    #
+    set timed_out 0
+    eval { spawn -noecho sh -c "$vmips $commandline 2>&1 || true" }
+    set comp_output ""
+    expect {
+        -re ".+" { set comp_output "$comp_output$expect_out(0,string)"; 
+                   exp_continue }
+        timeout { verbose "testcase timed out"; set timed_out -1 }
+        eof
+    }
+    regsub -all "\r\n" $comp_output "\n" munged_output
+    set comp_output "$munged_output"
+    catch { close -i $spawn_id }
+    wait
+    return $timed_out
+}
+
+#
+# Stop vmips.
+# Does nothing for now, because vmips stops more or less automatically
+# for all our test cases.
+#
+proc vmips_exit {} {
+}
+
+#
+# Load a testcase into vmips.
+# Does nothing for now, because vmips loads test cases from the command
+# line. One could conceive of a (hairy) framework where we actually use
+# xmboot to load a test case into a running vmips...
+#
+proc vmips_load {} {
+}
+
+#
+# Prints out the vmips version.
+#
+proc vmips_version {} {
+    set vmips [vmips_tool_exec_name]
+    set version_output [exec $vmips --version | head -1]
+    regsub -- "vmips (.*)$" $version_output {"\1"} version
+    clone_output "vmips version $version\n"
+}
+

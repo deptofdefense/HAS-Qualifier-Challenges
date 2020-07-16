@@ -1,0 +1,6 @@
+# BUILD RULES: testcase_simple_asm -setup 1 store
+if {[vmips_target_endian] == "little"} {
+	regcheck_set_results {R08 12345678  R09 00005678 R10 00000078}
+} elseif {[vmips_target_endian] == "big"} {
+	regcheck_set_results {R08 12345678  R09 56780000 R10 78000000}
+}

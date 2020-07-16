@@ -1,0 +1,14 @@
+Usage: <output wav file> <string to send> <first packet start time (ns)> <delay between packets (ns)> <number of packets> <signal power> <noise power> <seed string>
+
+Jason should write more but here goes:
+
+<output wav file> : Output file to write the created wav file to
+<string to send> : A string to include inside the output signal (which is a 2400 baud FSK waveform)
+<first packet start time> : The start time of the first packet to begin sending (in nanoseconds)
+<delay between packets> : This time will be used to delay between sending the next packet (same as previous), essentialy the gap between transmissions
+<number of packets> : This is the number of packets to include in the output file, repeated this many times
+<signal power> : An absolute amplitude of the signal power, value should be from 0->32767 (signed uint16 max)
+<noise power> : An absolute amplitude of the noise power, value should be from 0->32767 (signed uint16 max)
+<seed string> : This argument will seed the random number generator which is used to generate the AWGN noise
+
+

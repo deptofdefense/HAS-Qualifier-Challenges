@@ -1,0 +1,26 @@
+# BUILD RULES: testcase_simple_asm -setup 1 cstore2
+if {[vmips_target_endian] == "little"} {
+    regcheck_set_results {
+	R11 12345678
+	R12 00009abc
+	R13 0000def0
+	R14 def09abc
+	R16 000000a1
+	R17 000000b2
+	R18 000000c3
+	R19 000000d4
+	R20 d4c3b2a1
+    }
+} elseif {[vmips_target_endian] == "big"} {
+    regcheck_set_results {
+	R11 12345678
+	R12 00009abc
+	R13 0000def0
+	R14 9abcdef0
+	R16 000000a1
+	R17 000000b2
+	R18 000000c3
+	R19 000000d4
+	R20 a1b2c3d4
+    }
+}

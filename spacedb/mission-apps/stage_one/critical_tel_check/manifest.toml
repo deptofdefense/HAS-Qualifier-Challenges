@@ -1,0 +1,5 @@
+name = "critical_tel_check"
+executable = "crit_check.py"
+config = "/challenge/local_config.toml"
+version = "0.1"
+author = "ultron-browser"

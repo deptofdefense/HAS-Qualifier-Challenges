@@ -1,0 +1,7 @@
+regcheck_set_results { pc      bfc00180 \
+                       nextepc bfc00180 \
+                       r04     00000001 \
+                       r05     00000003 \
+                       r06     00000007 \
+                       r07     00000006 \
+                       r08     7fffffff }

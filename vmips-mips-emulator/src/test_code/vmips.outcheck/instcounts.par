@@ -1,0 +1,2 @@
+OPTIONS: -o instcounts -o nobootmsg
+GREP: 10 instructions in [0-9.]+ seconds \(([0-9.]+|Inf) instructions per second\)

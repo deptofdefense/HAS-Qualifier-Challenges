@@ -1,0 +1,10 @@
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/apps/osk_app_fw
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/apps/cfs_lib
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/apps/expat_lib
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/apps/kit_ci
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/apps/kit_sch
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/apps/kit_to
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/apps/mm
+PREDEFINED +=  _XOPEN_SOURCE=600
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/osal/src/os/posix
+INPUT += /home/cliff/work/challenges/patch/challenge/cfs/psp/fsw/pc-linux

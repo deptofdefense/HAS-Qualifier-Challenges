@@ -1,0 +1,2 @@
+/usr/bin/ar qc libut_bsp.a  CMakeFiles/ut_bsp.dir/src/bsp/pc-linux/ut-src/bsp_ut.c.o CMakeFiles/ut_bsp.dir/src/bsp/pc-linux/ut-src/bsp_ut_voltab.c.o
+/usr/bin/ranlib libut_bsp.a

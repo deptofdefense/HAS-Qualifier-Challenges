@@ -1,0 +1,1 @@
+/usr/bin/gcc -Wall -m32  -D_XOPEN_SOURCE=600    -g  -Wl,--export-dynamic -rdynamic CMakeFiles/core-cpu1.dir/src/target_config.c.o  -o core-cpu1 -Wl,--whole-archive ../cfe_core_default_cpu1/libcfe_core_default_cpu1.a ../psp/pc-linux/libpsp-pc-linux.a ../osal/libosal.a -Wl,--no-whole-archive -lpthread -ldl -lrt 

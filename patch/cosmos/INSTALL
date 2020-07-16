@@ -1,0 +1,4 @@
+$ ./setup.sh
+$ source ~/.bashrc
+$ rm Gemfile.lock
+$ bundle install

@@ -1,0 +1,24 @@
+TITLE 'cFS Command and Telemetry Server'
+
+# Can't map same target to two interfaces. Current strategy is to always connect locally
+# and allow a switch to a PiSat interface. Another option may be to start both interfaces
+# and then remap the targets.
+ INTERFACE LOCAL_CFS_INT tcpip_client_interface.rb 127.0.0.1 19021 19021 10 nil LENGTH 32 16 7 1 BIG_ENDIAN
+  PROTOCOL WRITE ChecksumProtocol
+
+  TARGET SYSTEM
+  
+  TARGET CFE_ES
+  TARGET CFE_EVS
+  TARGET CFE_SB
+  TARGET CFE_TBL
+  TARGET CFE_TIME
+  TARGET KIT_CI
+  TARGET KIT_SCH
+  TARGET KIT_TO
+  
+  
+INTERFACE COSMOSINT cmd_tlm_server_interface.rb
+  TARGET COSMOS
+  DISABLE_DISCONNECT
+  

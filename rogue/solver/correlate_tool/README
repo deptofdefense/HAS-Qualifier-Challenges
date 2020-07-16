@@ -1,0 +1,11 @@
+Use this tool to correlate a signal capture against one or more other files
+
+Usage: <scan start ns> <scan end ns> <reference recording file> <compare file 1> <compare file 2> ...
+
+<scan start ns> : Will ignore the samples before the start time (in nanoseconds) when correlating (this will improve correlation speed)
+<scan end ns> :  Will stop correlating at end time (in nanoseconds) this will improve correlation speed as the correlator will not search past this time
+<reference file> : This is the reference file with the signal that will be correlated against in the list of files passed
+<compare file n> : 1 or more compare files that will be correlated against the reference file
+
+A good correlation will return a sample offset and timestamp for the highest matched correlation value
+

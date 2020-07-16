@@ -1,0 +1,59 @@
+#!/usr/bin/python
+
+import cgi, os
+flag=os.environ.get('USER')
+flag=str(flag)    
+flag='FlagGoesHere' ##### CANT GET ENV?
+
+url = cgi.FieldStorage()
+camera=url['CAMERA'].value
+camera=camera.split(',')
+camlooklng=float(camera[0])
+camlooklat=float(camera[1])
+camlookrng=float(camera[2])
+camlooktlt=float(camera[3])
+camlookhed=float(camera[4])
+
+
+if camlooklng > -77.0437 and camlooklng < -77.0271 and camlooklat > 38.8839 and camlooklat < 38.8943 and camlookhed > 93.0757777778 and camlookhed < 97.0757777778 and camlooktlt > 13.0757222222 and camlooktlt < 15.0757222222:
+        if camlookrng < 250000:
+                    kml = (
+                        '<?xml version="1.0" encoding="UTF-8"?>\n'
+                        '<kml xmlns="http://www.opengis.net/kml/2.2">\n'
+                        '<Placemark>\n'
+                        '<name>The satellite couldn\'t have been this close, try zooming out.</name>\n'
+                        '<Point>\n'
+                        '<coordinates>%.6f,%.6f</coordinates>\n'
+                        '</Point>\n'
+                        '</Placemark>\n'
+                        '</kml>'
+                        ) %(camlooklng, camlooklat)
+        else:
+                    kml = (
+                        '<?xml version="1.0" encoding="UTF-8"?>\n'
+                        '<kml xmlns="http://www.opengis.net/kml/2.2">\n'
+                        '<Placemark>\n'
+                        '<name>CLICK FOR FLAG</name>\n'
+                        '<description>'+flag+',%.6f</description>\n'
+                        '<Point>\n'
+                        '<coordinates>-77.0354,38.889100</coordinates>\n'
+                        '</Point>\n'
+                        '</Placemark>\n'
+                        '</kml>'
+                        ) %(camlooktlt)
+else:
+        kml = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<kml xmlns="http://www.opengis.net/kml/2.2">\n'
+            '<Placemark>\n'
+            '<name>Keep Looking...</name>\n'
+            '<Point>\n'
+            '<coordinates>%.6f,%.6f</coordinates>\n'
+            '</Point>\n'
+            '</Placemark>\n'
+            '</kml>'
+            ) %(camlooklng, camlooklat)
+                                      
+print 'Content-Type: application/vnd.google-earth.kml+xml\n'
+print kml
+

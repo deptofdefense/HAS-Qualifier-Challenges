@@ -1,0 +1,7 @@
+OPTIONS: -o nobootmsg -o noinstdump -o excmsg
+BUILD RULES: testcase_makefile_fragment loser
+EXPECTED OUTPUT FOLLOWS:
+* Instruction bus error occurred -- HALTING *
+Exception 6 (Instruction bus error) triggered, EPC=bfc00004
+ Priority is 2; delay state is NORMAL; mem access mode is instruction fetch
+** Instruction fetch caused the exception! **

@@ -1,0 +1,135 @@
+@c %**start of header
+@c This is for the man page:
+@setfilename vmips.info
+@settitle VMIPS R3000-based MIPS simulator (running and customizing)
+@c %**end of header
+
+@ignore
+@c man begin SEEALSO
+as(1), ld(1), gdb(1), 
+and the Info entries for @file{vmips}, @file{gcc}, @file{as},
+@file{ld}, @file{binutils} and @file{gdb}.
+
+Important: The information in this man page is an extract from the full
+documentation of the VMIPS simulator, and is limited to the meaning of
+the command-line options. If you didn't find what you were looking for here,
+or you want more information, please refer to the Info file @file{vmips}
+or the VMIPS Programmer's Manual.  Both are made from the Texinfo source
+file vmips.texi.
+@c man end
+@c man begin BUGS
+For instructions on reporting bugs, see
+the "Reporting Bugs" appendix of the Info manual.
+@c man end
+@c man begin AUTHOR
+VMIPS was written by Brian Gaeke.
+@c man end
+@c man begin COPYRIGHT
+@include copyright.texi
+@c man end
+@c man begin DESCRIPTION
+When you invoke vmips, it loads a ROM file specified on the command line,
+initializes and resets the MIPS processor, and begins execution at the first
+address of the ROM file, which is normally loaded at address 0xbfc00000.
+@c man end
+@end ignore
+
+@c DESCRIPTION ENVIRONMENT NOTES FOOTNOTES COPYRIGHT
+@node Invoking vmips, Customizing, Building Programs, Top
+@chapter Invoking vmips
+
+VMIPS is started by running the "vmips" program from the command line.
+The format of the VMIPS command line is any one of the following:
+
+@c man begin SYNOPSIS
+@example
+vmips [-n] [-F FILE] [-o option_string] ... rom_file
+vmips --help
+vmips --version
+vmips --print-config
+@end example
+@c man end
+
+@c man begin OPTIONS
+This is what the different command line options mean:
+
+@table @samp
+@item -F FILE
+Read options from FILE instead of the @file{.vmipsrc} in your home directory.
+
+@item -n
+Do not read the system-wide configuration file, usually called
+@file{/usr/local/etc/vmipsrc}.
+
+@item --help
+Prints a short summary of VMIPS command line options, and exits
+successfully.
+
+@item --version
+Prints a short summary of VMIPS version and copyright information,
+and exits successfully.
+
+@item --print-config
+Prints a short summary of VMIPS compile-time configuration information,
+and exits successfully.
+
+@item -o something
+Set the option "something" as if "something" were in your
+.vmipsrc file.  See the "VMIPS options" section of the
+"Customizing" chapter for more information on what kind
+of things can go in your .vmipsrc file. You can use as many
+-o options on the command line as your shell will let you.
+
+@cindex ROM, selecting file for
+@item rom_file
+Use the named file as the ROM file VMIPS should boot. This
+option is mandatory.
+@end table
+@c man end
+
+@c man begin FILES
+@node Customizing, Invoking vmipstool, Invoking vmips, Top
+@chapter Customizing
+
+@section VMIPS options
+
+The VMIPS simulator gets runtime options from four different sources,
+in this order: first, it checks its compile-time defaults, which are
+set by the site administrator in the source file @file{optiontbl.h}. Then,
+the system-wide configuration file is read, unless you specify the @samp{-n}
+option; usually this file is called
+@file{/usr/local/etc/vmipsrc}, but it may have been moved by the site
+administrator or by the maintainers of your distribution.
+(This is configurable in the source file @file{options.h}, and
+by specifying the --prefix and --sysconfdir options to the GNU
+@command{configure}
+script when building VMIPS.) Next, it checks the user's own configuration
+file, usually the file @file{.vmipsrc} in your home directory, or whatever
+file you specify using the @samp{-F} option. Last, it
+reads the command line, and gets any options listed there.
+
+@section Format of the configuration file
+
+The configuration file may contain as many options per line as you want,
+provided no single line exceeds 1,024 characters in length.  Whitespace
+separates options from one another.  Single quotes and backslash are valid
+in the configuration file. Their meanings are similar to those found in
+the Bourne shell: any text within paired single quotes is uninterpreted,
+as is any character immediately following a backslash.  A comment is
+any text starting from a hash mark to the end of the line, inclusive.
+
+A string or number option named NAME can appear as NAME=VALUE, where VALUE
+is the string or number in question.  If the number begins with 0x, it will
+be interpreted as a 32-bit hexadecimal number, and if it begins with 0,
+it will be interpreted as octal. Otherwise, it will be interpreted as a
+decimal number. Numbers are always unsigned. A Boolean option named NAME
+can appear as either NAME (to set it to TRUE) or noNAME (to set it to FALSE).
+
+@section Summary of configuration options
+
+The following is a list of the configuration options present in this
+version of VMIPS.
+
+@c This part of the manual is automatically generated by `makeoptdoc'.
+@include options.texi
+@c man end

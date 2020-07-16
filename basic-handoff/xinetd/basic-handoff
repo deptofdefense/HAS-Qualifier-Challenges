@@ -1,0 +1,15 @@
+service basic_handoff
+{
+    disable     = no
+    id          = basic_handoff
+    socket_type = stream
+    protocol    = tcp
+    flags       = IPv4 IPv6
+    port        = 1234
+    wait        = no
+    user        = ubuntu
+    group       = docker
+    server      = /home/ubuntu/ticket-taker/bin/ticket-taker
+    env         = CONFIG_DIR=/home/ubuntu/basic-handoff
+    type        = UNLISTED
+}

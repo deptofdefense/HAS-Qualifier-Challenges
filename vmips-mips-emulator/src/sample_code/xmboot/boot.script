@@ -1,0 +1,21 @@
+/* This is here so that we can use 16M of memory for vmips instead of 1M,
+ * so we can boot bigger kernels.
+ */
+SECTIONS {
+ ENTRY( __start )
+ . = 0xbfc00000;
+ .text : { *(.text) ; _etext = . ; }
+ . = 0xa0000000 + ( 0x1000000 * 15 / 16 ) ;
+     /* ^^^ must match boot_setup.S DATA_START */
+ _gp = .;
+ _copystart = SIZEOF(.text) + ADDR(.text) ;
+ .data : AT ( SIZEOF(.text) + ADDR(.text) )
+    { _data = . ;
+      *(.data) *(.rdata) *(.rodata) *(.mdebug) *(.reginfo) ;
+      *(.sdata) *(.scommon) ;
+      _edata = . ; }
+ _copyend = SIZEOF(.data) + SIZEOF(.text) + ADDR(.text) ;
+ .bss : AT ( SIZEOF(.data) + SIZEOF(.text) + ADDR(.text) )
+	{ _bss = . ; *(.bss) *(.sbss) *(COMMON) ; _ebss = . ; }
+ _end = . ;
+}

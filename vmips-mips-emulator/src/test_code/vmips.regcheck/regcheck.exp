@@ -1,0 +1,12 @@
+
+load_lib vmips-regcheck.exp
+
+foreach testcase [glob $srcdir/$subdir/*.par] {
+	# If we're only testing specific files and this isn't one of them, skip it.
+	if ![runtest_file_p $runtests $testcase] then {
+		continue
+	}
+	verbose "$testcase\n"
+	regcheck_run_one_test $testcase
+}
+

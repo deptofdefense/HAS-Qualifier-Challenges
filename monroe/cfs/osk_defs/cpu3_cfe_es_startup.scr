@@ -1,0 +1,57 @@
+CFE_LIB, /cf/cfs_lib.obj,      CFS_LibInit,      CFS_LIB,        0,       0, 0x0, 0;
+CFE_LIB, /cf/osk_app_lib.obj,  OSK_APP_FwInit,   OSK_APP_FW,     0,    8192, 0x0, 0;
+CFE_LIB, /cf/expat_lib.obj,    EXPAT_Init,       EXPAT_LIB,      0,    8192, 0x0, 0;
+CFE_APP, /cf/ds.obj,           DS_AppMain,       DS,            70,   16384, 0x0, 0;
+CFE_APP, /cf/fm.obj,           FM_AppMain,       FM,            80,   16384, 0x0, 0;
+CFE_APP, /cf/hs.obj,           HS_AppMain,       HS,           120,   16384, 0x0, 0;
+CFE_APP, /cf/hk.obj,           HK_AppMain,       HK,            90,   16384, 0x0, 0;
+CFE_APP, /cf/kit_sch.obj,      KIT_SCH_AppMain,  KIT_SCH,       10,   16384, 0x0, 0;
+CFE_APP, /cf/kit_to.obj,       KIT_TO_AppMain,   KIT_TO,        30,   16384, 0x0, 0;
+CFE_APP, /cf/kit_ci.obj,       KIT_CI_AppMain,   KIT_CI,        20,   16384, 0x0, 0;
+CFE_APP, /cf/md.obj,           MD_AppMain,       MD,            90,   16384, 0x0, 0;
+CFE_APP, /cf/mm.obj,           MM_AppMain,       MM,            90,   16384, 0x0, 0;
+CFE_APP, /cf/sc.obj,           SC_AppMain,       SC,            80,   16384, 0x0, 0;
+CFE_APP, /cf/cs.obj,           CS_AppMain,       CS,            90,   16384, 0x0, 0;
+CFE_APP, /cf/cf.obj,           CF_AppMain,       CF,           100,   80192, 0x0, 0;
+CFE_APP, /cf/lc.obj,           LC_AppMain,       LC,            80,   16384, 0x0, 0;
+CFE_APP, /cf/eyassat_if.obj,   EYASSAT_IF_AppMain, EYASSAT_IF,  90,   80192, 0x0, 0;
+CFE_APP, /cf/f42.obj,          F42_AppMain,      F42,           50,   16384, 0x0, 0;
+CFE_APP, /cf/i42.obj,          I42_AppMain,      I42,          100,   80192, 0x0, 0;
+CFE_APP, /cf/adcs.obj,         ADCS_AppMain,     ADCS,          90,   80192, 0x0, 0;
+!CFE_APP, /cf/tftp.obj,        TFTP_AppMain,     TFTP,         60,   16384, 0x0, 0;
+!CFE_APP, /cf/osk_demo_app.obj, OSK_DEMO_AppMain, OSK_DEMO,    120,    8192, 0x0, 0;
+!CFE_APP, /cf/isim.obj,        ISIM_AppMain,     ISIM,         90,   16384, 0x0, 0;
+!CFE_APP, /cf/hc.obj,          HC_AppMain,       HC,           80,   16384, 0x0, 0;
+!CFE_APP, /cf/hsim.obj,        SIM_AppMain,      HSIM,         90,   16384, 0x0, 0;
+! I42 & F42 are set low so 42 Simulator-to-FSW closed looped doesn't hog the system. The
+! current design has a crude throttling and rate limiting mechanism
+!CFE_APP, /cf/bm.obj,           BM_AppMain,       BM,            80,   16384, 0x0, 0;
+!CFE_APP, /cf/example.obj,      EXAMPLE_AppMain,  EXAMPLE,       90,   16384, 0x0, 0;
+!CFE_LIB, /cf/sample_lib.obj,  SAMPLE_LibInit,  SAMPLE_LIB,    0,      0,  0x0, 0;
+!CFE_APP,cfs /cf/sample_app.obj,  SAMPLE_AppMain,  SAMPLE_APP,  150,   16384, 0x0, 0;
+!CFE_LIB, /cf/math_lib.obj,    Math_Init,       MATH_LIB,      0,  8192,  0x0, 0;
+!
+! Startup script fields:
+! 1. Object Type      -- CFE_APP for an Application, or CFE_LIB for a library.
+! 2. Path/Filename    -- This is a cFE Virtual filename, not a vxWorks device/pathname
+! 3. Entry Point      -- This is the "main" function for Apps.
+! 4. CFE Name         -- The cFE name for the the APP or Library
+! 5. Priority         -- This is the Priority of the App, not used for Library
+! 6. Stack Size       -- This is the Stack size for the App, not used for the Library
+! 7. Load Address     -- This is the Optional Load Address for the App or Library. Currently not implemented
+!                        so keep it at 0x0.
+! 8. Exception Action -- This is the Action the cFE should take if the App has an exception.
+!                        0        = Just restart the Application 
+!                        Non-Zero = Do a cFE Processor Reset
+!
+! Other  Notes:
+! 1. The software will not try to parse anything after the first '!' character it sees. That
+!    is the End of File marker.
+! 2. Common Application file extensions: 
+!    Linux = .obj  ( ci.obj )
+!    OS X  = .bundle  ( ci.bundle )
+!    Cygwin = .dll ( ci.dll )
+!    vxWorks = .o ( ci.o )
+!    RTEMS with S-record Loader = .s3r ( ci.s3r )
+!    RTEMS with CEXP Loader = .o ( ci.o )
+ 

@@ -1,0 +1,5 @@
+name = "print_all_apps"
+executable = "print_all_apps.py"
+config = "/challenge/local_config.toml"
+version = "0.1"
+author = "ultron-browser"

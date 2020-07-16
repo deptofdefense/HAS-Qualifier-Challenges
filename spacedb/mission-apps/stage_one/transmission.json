@@ -1,0 +1,32 @@
+{
+    "tasks": [
+        {
+            "description": "Orient antenna to ground.",
+            "time": 0,
+            "app": {
+                "name": "groundpoint"
+            }
+        },
+        {
+            "description": "Power-up downlink antenna.",
+            "time": 0,
+            "app": {
+                "name": "enable_downlink"
+            }
+        },
+        {
+            "description": "Power-down downlink antenna.",
+            "time": 0,
+            "app": {
+                "name": "disable_downlink"
+            }
+        },
+        {
+            "description": "Orient solar panels at sun.",
+            "time": 0,
+            "app": {
+                "name": "sunpoint"
+            }
+        }
+    ]
+}

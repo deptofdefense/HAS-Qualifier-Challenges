@@ -1,0 +1,22 @@
+SECTIONS {
+ ENTRY( __start )
+ /DISCARD/ : { *(.note.gnu.build-id) *(.gnu.attributes) *(.comment) *(.MIPS.abiflags) }
+ . = 0xbfc00000;
+ .start : { *(.text) ; _estart = . ; }
+ .text : AT( SIZEOF(.start) + ADDR(.start) )
+    { *(.text.*) ; _etext = . ; }
+ . = 0xa0000000 + ( 0x200000 * 3 / 4 ) ; /* must match setup.S DATA_START */
+ _gp = .;
+ _copystart = SIZEOF(.text) + ADDR(.text) ;
+ .data : AT ( SIZEOF(.text) + ADDR(.text) )
+    { _data = . ;
+      *(.data) *(.rdata) *(.rodata*) *(.mdebug) *(.reginfo) ;
+      *(.sdata) *(.scommon) *(.lit8);
+      _edata = . ; }
+ _copyend = SIZEOF(.data) + SIZEOF(.text) + ADDR(.text) ;
+ .bss : AT ( SIZEOF(.data) + SIZEOF(.text) + ADDR(.text) )
+	{ _bss = . ; *(.bss) *(.sbss) *(COMMON) ; _ebss = . ; }
+ .kdata : AT ( SIZEOF(.data) + SIZEOF(.text) + ADDR(.text) + SIZEOF(.bss) )
+	{ _kdata = . ; *(.kdata) ; _ekdata = .; }
+ _end = . ;
+}

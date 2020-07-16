@@ -1,0 +1,46 @@
+
+VMIPS
+*****
+
+   This is VMIPS, a MIPS R3000 virtual machine simulator.
+
+   VMIPS is free software available under the GNU General Public
+License; for details, please read the file "COPYING". For installation
+instructions, please read "INSTALL". VMIPS was built by Brian Gaeke and
+others; for details, please see the files "AUTHORS" and "THANKS". New
+features since the last publically released version are detailed in
+"NEWS".
+
+   The documentation is in the "doc" directory. Some sample code you can
+run on it is in the "sample_code" directory. Some tests you can run on it
+to make sure it works on your computer are in the "test_code" directory.
+
+   The home page for VMIPS is "http://www.dgate.org/vmips". For bug
+reporting instructions (copied from the VMIPS Manual), please see below.
+
+
+Reporting Bugs
+**************
+
+   We are always interested in hearing about VMIPS bugs.  Please send
+mail to `vmips@dgate.org' and tell us about them.  Please include at
+least the following information:
+
+   * your operating system
+
+   * your host processor type
+
+   * your C++ and C compiler make and version
+
+   * the version of VMIPS you are using
+
+   * how you configured VMIPS
+
+   * how to trigger the bug
+
+   * what you expected to see
+
+   * how what you saw differed from what you expected to see
+
+   * how you think it could be fixed (send a patch if you have one)
+

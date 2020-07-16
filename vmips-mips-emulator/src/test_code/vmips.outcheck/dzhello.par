@@ -1,0 +1,6 @@
+OPTIONS: -o noinstdump -o nobootmsg -o deccsr -o decrtc -o decstat -o nospimconsole -o decserial -o excmsg
+EXPECTED OUTPUT FOLLOWS:
+Hello, DEC serial device
+* BREAK instruction reached -- HALTING *
+Exception 9 (Breakpoint32 exception (BREAK instr)) triggered, EPC=bfc00314
+ Priority is 4; delay state is NORMAL; mem access mode is not applicable

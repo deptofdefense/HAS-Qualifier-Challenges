@@ -1,0 +1,4 @@
+# BUILD RULES: testcase_simple_asm -setup 1 tlbwr
+regcheck_set_results { \
+R08 01234000  R09 00000200 R10 00000000  \
+R11 80000000  PC bfc00180 NEXTEPC bfc00314 }

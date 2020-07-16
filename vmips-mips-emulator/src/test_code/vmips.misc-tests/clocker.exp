@@ -1,0 +1,38 @@
+
+#
+# clocker.exp
+#
+# This one is tricky because we have to verify not just that the output
+# comes out right, but that it comes out in the correct time interval.
+#
+
+load_lib vmips-misc.exp; misc_test_setup clocker
+#
+# This one needs a bigger timeout than the default.
+#
+set timeout 5
+
+#
+# Need to use the right options here: pass real time to simulated clock
+# at 1 times wall clock time.
+#
+spawn -noecho $vmips -n -F /dev/null -o [vmips_endian_option] -o noinstdump \
+ -o nobootmsg -o realtime -o timeratio=1 $romfile
+
+expect { 
+	-re {^\.\.\.\.\.$}    { verbose "Got 5 dots in 5 seconds"; send "\004" }
+	-re "^Error"    { verbose "error"; fail $testcase; return }
+	timeout    { verbose "abort";  fail $testcase; return } 
+	eof        { verbose "eof";  fail $testcase; return }
+}
+expect { 
+	-ex "* BREAK instruction reached -- HALTING *"    { verbose "halted" } 
+	timeout    { verbose "abort2";  fail $testcase; return } 
+	eof        { verbose "eof2";  fail $testcase; return }
+}
+
+pass $testcase
+
+close
+wait
+

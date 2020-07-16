@@ -1,0 +1,5 @@
+OPTIONS: -o excmsg -o noinstdump -o nobootmsg
+EXPECTED OUTPUT FOLLOWS:
+* BREAK instruction reached -- HALTING *
+Exception 9 (Breakpoint32 exception (BREAK instr)) triggered, EPC=bfc00314
+ Priority is 4; delay state is NORMAL; mem access mode is not applicable

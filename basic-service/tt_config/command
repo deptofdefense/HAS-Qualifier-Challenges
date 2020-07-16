@@ -1,0 +1,1 @@
+docker run --rm __TT_ENV__ -e TIMEOUT=2 basic-service:challenge

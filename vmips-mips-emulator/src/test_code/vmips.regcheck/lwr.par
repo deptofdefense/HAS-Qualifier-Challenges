@@ -1,0 +1,15 @@
+if {[vmips_target_endian] == "big"} {
+	regcheck_set_results { \
+	r10  aa112233 \
+	r11  11223344 \
+	r8  aabbcc11 \
+	r9  aabb1122 \
+	}
+} elseif {[vmips_target_endian] == "little"} {
+	regcheck_set_results { \
+	r10  aabb1122 \
+	r11  aabbcc11 \
+	r8  11223344 \
+	r9  aa112233 \
+	}
+}

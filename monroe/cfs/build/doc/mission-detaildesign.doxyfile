@@ -1,0 +1,23 @@
+#---------------------------------------------------------------------------
+# Doxygen options to generate the complete mission documentation
+#---------------------------------------------------------------------------
+
+# Start with the common definitions, some of which are extended or overridden here.
+@INCLUDE               = /home/cliff/work/challenges/patch/challenge/cfs/build/doc/cfe-common.doxyfile
+PROJECT_NAME           = "OpenSatKit"
+PROJECT_BRIEF          = "Core Flight System project built using \"osk\" configuration"
+OUTPUT_DIRECTORY       = detaildesign
+
+INPUT                 += /home/cliff/work/challenges/patch/challenge/cfs/osk_defs  \
+                         /home/cliff/work/challenges/patch/challenge/cfs/osal/src/os/inc \
+                         /home/cliff/work/challenges/patch/challenge/cfs/osal/src/os/shared \
+                         /home/cliff/work/challenges/patch/challenge/cfs/psp/fsw/inc \
+                         /home/cliff/work/challenges/patch/challenge/cfs/psp/fsw/shared \
+                         /home/cliff/work/challenges/patch/challenge/cfs/cfe/fsw/cfe-core/src
+                         
+STRIP_FROM_PATH       += /home/cliff/work/challenges/patch/challenge/cfs/osk_defs
+
+#---------------------------------------------------------------------------
+# The user content doxyfile contains paths to the mission-specific applications   
+#---------------------------------------------------------------------------
+@INCLUDE               = /home/cliff/work/challenges/patch/challenge/cfs/build/doc/mission-content.doxyfile

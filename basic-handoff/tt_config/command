@@ -1,0 +1,1 @@
+LCM_MIN_PORT=10000 LCM_INNER_PORT_BASE=80 /home/ubuntu/lcm/target/release/lifecycle_manager __TT_ENV__

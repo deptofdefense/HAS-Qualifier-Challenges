@@ -1,0 +1,69 @@
+< 2020/06/30 23:19:57.783990  length=49 from=0 to=48
+### Welcome to kubOS ###
+Initializing System ...
+< 2020/06/30 23:20:17.366983  length=52 from=49 to=100
+
+** Welcome to spaceDB **
+-------------------------
+< 2020/06/30 23:20:17.499364  length=61 from=101 to=161
+
+req_flag_base  warn: System is critical. Flag not printed.
+
+< 2020/06/30 23:20:24.495647  length=128 from=162 to=289
+critical-tel-check  info: Detected new telemetry values.
+critical-tel-check  info: Checking recently inserted telemetry values.
+< 2020/06/30 23:20:24.497646  length=93 from=290 to=382
+critical-tel-check  info: Checking gps subsystem
+critical-tel-check  info: gps subsystem: OK
+< 2020/06/30 23:20:24.499294  length=114 from=383 to=496
+critical-tel-check  info: reaction_wheel telemetry check.
+critical-tel-check  info: reaction_wheel subsystem: OK.
+< 2020/06/30 23:20:24.502761  length=341 from=497 to=837
+critical-tel-check  info: eps telemetry check.
+critical-tel-check  warn: VIDIODE battery voltage too low.
+critical-tel-check  warn: Solar panel voltage low
+critical-tel-check  warn: System CRITICAL.
+critical-tel-check  info: Position: GROUNDPOINT
+critical-tel-check  warn: Debug telemetry database running at: 172.17.0.1:19011/tel/graphiql
+
+< 2020/06/30 23:20:29.494012  length=128 from=838 to=965
+critical-tel-check  info: Detected new telemetry values.
+critical-tel-check  info: Checking recently inserted telemetry values.
+< 2020/06/30 23:20:29.497362  length=93 from=966 to=1058
+critical-tel-check  info: Checking gps subsystem
+critical-tel-check  info: gps subsystem: OK
+< 2020/06/30 23:20:29.499595  length=114 from=1059 to=1172
+critical-tel-check  info: reaction_wheel telemetry check.
+critical-tel-check  info: reaction_wheel subsystem: OK.
+< 2020/06/30 23:20:30.589132  length=361 from=1173 to=1533
+critical-tel-check  info: eps telemetry check.
+critical-tel-check  warn: Solar panel voltage low
+critical-tel-check  info: eps subsystem: OK
+critical-tel-check  info: Position: GROUNDPOINT
+critical-tel-check  warn: System: OK. Resuming normal operations.
+critical-tel-check  info: Scheduler service comms started successfully at: 172.17.0.1:19011/sch/graphiql
+
+< 2020/06/30 23:20:32.720157  length=41 from=1534 to=1574
+sunpoint  info: Adjusting to sunpoint...
+< 2020/06/30 23:20:32.720316  length=63 from=1575 to=1637
+sunpoint  info: [2020-07-01 03:20:31] Sunpoint panels: SUCCESS
+< 2020/06/30 23:20:32.720435  length=1 from=1638 to=1638
+
+< 2020/06/30 23:20:32.871440  length=40 from=1639 to=1678
+Low_power mode enabled.
+Timetraveling.
+
+< 2020/06/30 23:20:34.438530  length=199 from=1679 to=1877
+Transmission mode enabled.
+
+Pointing to ground.
+Transmitting...
+
+----- Downlinking -----
+Recieved flag.
+flag{foobar:baz_babe-1234}
+
+Downlink disabled.
+Adjusting to sunpoint...
+Sunpoint: TRUE
+Goodbye

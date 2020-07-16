@@ -1,0 +1,1 @@
+BUILD RULES: testcase_multifile_c sort {sort.c random.c}

@@ -1,0 +1,208 @@
+#!/usr/bin/perl
+
+use Fcntl;
+use Getopt::Std;
+
+$WORDSIZE = 4;
+$RESETADDR = 0xbfc00000;
+
+&getopts('abvn');
+$mode = 'above';
+if ($opt_a) { $mode = 'above'; }
+if ($opt_b) { $mode = 'below'; }
+
+$bootrom = $ARGV[0];
+$exe = $bootrom; $exe =~ s/\.rom$/.exe/;
+$file    = $ARGV[1];
+$out     = $ARGV[2];
+unless ( $bootrom && $file && $out ) {
+    die "usage: $0 [-abv] BOOTROM-FILE.rom ECOFF-FILE OUTPUT-FILE\n";
+}
+foreach my $f ($bootrom, $file, $exe) {
+	die "Error: $f does not exist\n" unless -f $f;
+}
+my $magic = readShortAt ($file, 0);
+$MIPSEBMAGIC = 0x0160;
+$MIPSELMAGIC = 0x0162;
+$MIPSEBMAGICSWAPPED = 0x6001;
+$MIPSELMAGICSWAPPED = 0x6201;
+if (($magic == $MIPSEBMAGICSWAPPED) || ($magic == $MIPSELMAGICSWAPPED)) {
+	$BYTESWAP = 1;
+	$magic = readShortAt ($file, 0);
+}
+if (!(($magic == $MIPSELMAGIC) || ($magic == $MIPSEBMAGIC))) {
+	die "Error: $file is not a MIPS ECOFF file\n";
+}
+
+$paddedfile = pad($file);
+$bsize      = getwords($bootrom);
+$fsize      = getwords($paddedfile);
+$baddr      = $RESETADDR;
+vprintf("%s will be loaded at 0x%lx\n", $bootrom, $baddr);
+if ($mode eq 'above') {
+    $foffset = ( $bsize * $WORDSIZE );
+    $boffset = 0;
+} elsif ($mode eq 'below') {
+    $foffset = -( $fsize * $WORDSIZE );
+    $boffset = $fsize * $WORDSIZE;
+}
+$faddr = $RESETADDR + $foffset;
+if (($faddr < $baddr) && ($faddr < $RESETADDR)) {
+	printf "Warning: new ROM base address is 0x%x\n", $faddr;
+}
+if (((($fsize + $bsize) * $WORDSIZE) > (2**20)) && $mode eq 'above') {
+	printf "Warning: new ROM size 0x%x larger than 1MByte\n", (($fsize + $bsize) * $WORDSIZE);
+}
+vprintf("%s will be loaded at 0x%lx\n", $file, $faddr);
+if ($mode eq 'above') {
+	system("cat $bootrom $paddedfile > $out 2>/dev/null");
+} elsif ($mode eq 'below') {
+	system("cat $paddedfile $bootrom > $out 2>/dev/null");
+}
+unlink ($paddedfile);
+getwords($out);
+vprintf("use this to boot the system:   rom 0x%lx %d\n", $faddr, $fsize);
+vprintf("booter offset: %x\n", $boffset);
+unless ($opt_n) {
+  patchBooter ($exe, $out, "recv_buffer", 0x80000000, $faddr, $boffset);
+  patchBooter ($exe, $out, "recv_size", 0xffffffff, $fsize, $boffset);
+}
+exit(0);
+
+sub pad {
+    my ($file) = @_;
+    my $tmp = "${file}.pad";
+    system("dd if=$file of=$tmp bs=4k conv=sync 2>/dev/null");
+    return $tmp;
+}
+
+sub getwords {
+    my ($file) = @_;
+    my ( $fsize, $fwords );
+    $fsize  = -s $file;
+    $fwords = int( $fsize / $WORDSIZE );
+    vprintf("$file is $fwords words\n");
+	return $fwords;
+}
+
+$nmbinary = "";
+sub getNMBinary {
+	if (! $nmbinary) {
+		local (*MAKEFILE);
+		open (MAKEFILE, "../../Makefile")
+			or die "can't read vmips/Makefile: $!\n";
+		my ($mipsbin, $target_alias);
+		while (<MAKEFILE>) {
+			if (/^mipsbin = (.*)$/) { $mipsbin = $1; }
+			if (/^target_alias = (.*)$/) { $target_alias = $1; }
+		}
+		close (MAKEFILE);
+		$nmbinary = "${mipsbin}/${target_alias}-nm";
+		die "Can't find nm in $nmbinary\n" unless -x $nmbinary;
+		vprintf ("found nm in $nmbinary\n");
+	}
+	return $nmbinary;
+}
+
+sub symbolAddress {
+	my ($file, $sym) = @_;
+	my $nm = getNMBinary ();
+	my ($rv, $found) = (0, 0);
+	open (NM, "$nm -P $file |") or die "Can't pipe from nm -P: $!";
+	SYMLOOP: while (<NM>) {
+		my ($symName, $symType, $symAddr) = split (" ");
+		if ($sym eq $symName) {
+			# Some versions of binutils have a very strange bug: they
+			# sign-extend 32-bit addresses to 64 bits!
+			if (length($symAddr) > 8) { $symAddr = substr ($symAddr, 8); }
+			$rv = eval ("0x$symAddr"); # ugh!
+			$found = 1;
+			last SYMLOOP;
+		}
+	}
+	close NM;
+	if ($found) {
+		vprintf ("Symbol '$sym' found in file '$file' at $rv\n");
+	} else {
+		warn "Symbol '$sym' not found in file '$file'\n" unless $found;
+	}
+	return $rv;
+}
+
+sub readWordAt {
+	my ($file, $offset) = @_;
+	local (*FILE);
+	my ($data, $word);
+	open (FILE, $file) or die "$file: $!\n";
+	seek (FILE, $offset, SEEK_SET);
+	read (FILE, $data, 4);
+        my $format = littleEndianFile() ? "V" : "N";
+	$word = unpack ($format, $data);
+	close (FILE);
+	vprintf("Read word at 0x%x in $file as 0x%x\n", $offset, $word);
+	return $word;
+}
+
+sub littleEndianFile {
+	return ($magic == $MIPSELMAGIC);
+}
+
+sub readShortAt {
+	my ($file, $offset) = @_;
+	local (*FILE);
+	my ($data, $short);
+	open (FILE, $file) or die "$file: $!\n";
+	seek (FILE, $offset, SEEK_SET);
+	read (FILE, $data, 2);
+        my $format = littleEndianFile() ? "v" : "n";
+	$short = unpack ($format, $data);
+	close (FILE);
+	vprintf("Read short at 0x%x in $file as 0x%x\n", $offset, $short);
+	return $short;
+}
+
+sub writeWordAt {
+	my ($file, $offset, $newword) = @_;
+	vprintf("Write word at 0x%x in $file to be 0x%x\n", $offset, $newword);
+	my ($file, $offset) = @_;
+	local (*FILE);
+	my ($data, $word);
+	open (FILE, "+<$file") or die "$file: $!\n";
+	seek (FILE, $offset, SEEK_SET);
+        my $format = littleEndianFile() ? "V" : "N";
+	$data = pack ($format, $newword);
+	print FILE $data;
+	close (FILE);
+}
+
+# patch $out which is a concatenated rom image built from $exe, 
+# by modifying the data symbol $symname to contain $newvalue 
+# if and only if it previously contained $expectedvalue.
+sub patchBooter {
+	my ($exe, $out, $symName, $expectedValue, $newValue, $booterOffset) = @_;
+	my $copystart = symbolAddress ($exe, '_copystart');
+	my $datastart = symbolAddress ($exe, '_data');
+	my $symAddressInRAM = symbolAddress ($exe, $symName);
+	my $start = symbolAddress ($exe, '__start');
+	my $symAddressInROM = $symAddressInRAM - ($datastart - $copystart);
+	vprintf("$symName: \@0x%x in RAM, \@0x%x in ROM, ", $symAddressInRAM,
+		$symAddressInROM);
+	my $symOffsetInROMFile = ($symAddressInROM - $start) + $booterOffset;
+	vprintf("offset \@0x%x in ROM file\n", $symOffsetInROMFile);
+	my $oldContents = readWordAt ($out, $symOffsetInROMFile);
+	if ($oldContents != $expectedValue) {
+		my $msg = sprintf "Error: Word at $symName is 0x%x, expected 0x%x\n",
+			$oldContents, $expectedValue;
+		die $msg;
+	}
+	writeWordAt ($out, $symOffsetInROMFile, $newValue);
+	my $newContents = readWordAt ($out, $symOffsetInROMFile);
+}
+
+sub vprintf
+{
+	if ($opt_v) {
+		printf @_;
+	}
+}
+

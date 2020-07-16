@@ -1,0 +1,49 @@
+## All of the following settings are defaults.
+## You can change them on a system-wide basis using this file.
+##
+# bootmsg
+# clockdevice
+# clockdeviceirq=7
+# clockintr=200000000
+# clockspeed=250000
+# debugport=0
+# execname=none
+# haltbreak
+# haltdevice
+# haltibe
+# loadaddr=0xbfc00000
+# memdumpfile=memdump.bin
+# memsize=0x100000
+# nodbemsg
+# nodebug
+# nodeccsr
+# nodecrtc
+# nodecserial
+# nodecstat
+# nodumpcp0
+# nodumpcpu
+# noexcmsg
+# noexcpriomsg
+# nofpu
+# nohaltdumpcp0
+# nohaltdumpcpu
+# noinstcounts
+# noinstdump
+# nomemdump
+# norealtime
+# noreportirq
+# notestdev
+# notracing
+# romfile=romfile.rom
+# spimconsole
+# timeratio=1
+# traceendpc=0
+# tracesize=100000
+# tracestartpc=0
+# ttydev2=off
+# ttydev=/dev/tty
+##
+## The following options have defaults set by `configure':
+##
+nobigendian
+mipstoolprefix=''

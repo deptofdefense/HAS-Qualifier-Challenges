@@ -1,0 +1,10 @@
+SECTIONS {
+ ENTRY( __start )
+ . = 0x80000000;
+ .text : { *(.text) ; _etext = . ; }
+ _gp = .;
+ .data : { _data = . ; *(.data) *(.rdata) *(.mdebug) *(.reginfo) 
+                  *(.sdata) *(.scommon) ; _edata = . ; }
+ .bss : { _bss = . ; *(.bss) *(.sbss) *(COMMON) ; _ebss = . ; }
+ _end = . ;
+}

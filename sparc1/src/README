@@ -1,0 +1,18 @@
+This is a set of example RTEMS programs.  Each subdirectory
+reflects a set of related examples.
+
+benchmarks   - Collection of various public benchmark programs
+classic_api  - Classic API examples (no LED)
+cxx          - C++ examples
+file_io      - File I/O
+filesystem   - File systems, check inside for more details
+gdb          - Programs to exercise GDB features
+hello        - Hello World Variations
+led          - LED Blinker Varations
+micromonitor - MicroMonitor interaction examples
+misc         - Miscellaneous 
+posix_api    - POSIX API examples (no led)
+schedsim     - RTEMS Scheduler Simulator examples
+ticker       - Ticker Variations
+uboot        - U-Boot interaction examples
+lvgl_hello   - LittleVGL graphics app example using libbsd framebuffer driver

@@ -1,0 +1,6 @@
+We detected this reference signal from one of our communication outposts, the outpost has an omnidirectional antenna which has an elevation of 25m. We are located at sea level (radius of 6371km) and are surrounded entirely by flat plains for at least 100km in every direction. The received signal has been captured as ref.wav and is aligned to the start of the rogue signal received. We do know the transmitter must be at least 2Km away based on the power received. 
+
+We also had multiple satellites overhead while this signal was transmitted, and we've included their received wave forms and information in case it helps! These satellites all have an ideal geosynchronous orbit (radius of 42164km)
+
+NOTE: Assume this planet is perfectly spherical.
+

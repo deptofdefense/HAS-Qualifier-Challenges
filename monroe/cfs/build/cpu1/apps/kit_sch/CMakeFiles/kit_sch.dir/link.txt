@@ -1,0 +1,1 @@
+/usr/bin/gcc -fPIC -Wall -m32  -D_XOPEN_SOURCE=600    -g  -shared  -o kit_sch.so CMakeFiles/kit_sch.dir/fsw/src/kit_sch_app.c.o CMakeFiles/kit_sch.dir/fsw/src/msgtbl.c.o CMakeFiles/kit_sch.dir/fsw/src/scheduler.c.o CMakeFiles/kit_sch.dir/fsw/src/schtbl.c.o 

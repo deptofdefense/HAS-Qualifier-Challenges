@@ -1,0 +1,110 @@
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datarootdir = @datarootdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+DESTDIR =
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ..
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+
+SUBDIRS=. xmboot
+VMIPSTOOL = $(top_builddir)/vmipstool -n -F $(top_builddir)/vmipsrc --ld-script=$(srcdir)/ld.script
+CLEANFILES=setup.o
+DISTCLEANFILES=
+DISTFILES= Makefile.in asm_regnames.h ld.script setup.S
+#------
+
+all: @SAMPLE_CODE_TARGETS@
+
+.PHONY: build_xmboot
+
+build_xmboot:
+	@cd xmboot && $(MAKE)
+
+# Nothing to do here:
+dvi check installcheck:
+
+install: ld.script
+	$(mkinstalldirs) $(DESTDIR)$(pkgdatadir) $(DESTDIR)$(pkgincludedir)
+	$(INSTALL_DATA) $(srcdir)/ld.script $(DESTDIR)$(pkgdatadir)/ld.script
+	$(INSTALL_DATA) $(srcdir)/setup.S $(DESTDIR)$(pkgdatadir)/setup.S
+	$(INSTALL_DATA) $(srcdir)/asm_regnames.h $(DESTDIR)$(pkgincludedir)/asm_regnames.h
+
+uninstall:
+	-rm -f $(DESTDIR)$(pkgdatadir)/ld.script
+	-rm -f $(DESTDIR)$(pkgdatadir)/setup.S
+	-rm -f $(DESTDIR)$(pkgincludedir)/asm_regnames.h
+
+clean:
+	-rm -f $(CLEANFILES)
+	@cd xmboot && $(MAKE) clean
+
+distclean: clean
+	-rm -f $(CLOBBERFILES)
+	@cd xmboot && $(MAKE) distclean
+
+maintainer-clean: distclean
+	@cd xmboot && $(MAKE) maintainer-clean
+
+%.o: %.s
+	$(VMIPSTOOL) --assemble -o $@ $<
+
+%.o: %.S
+	$(VMIPSTOOL) --assemble -o $@ $<
+
+# Snarfed from automake and modified.
+distdir: $(DISTFILES)
+	-rm -rf $(distdir)
+	mkdir $(distdir)
+	-chmod 777 $(distdir)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+	for subdir in $(SUBDIRS); do \
+	  if test "$$subdir" = .; then :; else \
+	    test -d $(distdir)/$$subdir \
+	    || mkdir $(distdir)/$$subdir \
+	    || exit 1; \
+	    chmod 777 $(distdir)/$$subdir; \
+	    (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir=../$(distdir) distdir=../$(distdir)/$$subdir distdir) \
+	    || exit 1; \
+	  fi; \
+	done
+

@@ -1,0 +1,517 @@
+
+Appendix D Release History
+**************************
+
+vmips-1.5.1 was released on 20 August 2018.  User-visible changes in
+version 1.5 (since version 1.5.1):
+
+   * Bug fixes:
+
+   * A pair of time calculations in the clock device were revised to
+     avoid triggering compile-time errors in newer C++11-compliant
+     compilers.
+
+   vmips-1.5 was released on 17 November 2014.  User-visible changes in
+version 1.5 (since version 1.4.1):
+
+   * New features/improvements:
+
+   * VMIPS now includes a basic direct-mapped cache simulation. The
+     cache isolation and cache swap bits in the CP0 Status register are
+     now honored.
+
+   * The boot monitor distributed with VMIPS now sets up a dummy
+     `argv[0]' value for the loaded program. Also, it halts by entering
+     an infinite loop rather than attempting to execute a `break'
+     instruction when it encounters an unexpected exception.
+
+   * The setup assembly routine distributed with VMIPS has been made
+     more TLB-friendly. Identity virtual-to-physical mappings for the
+     first few pages of physical RAM are installed in the TLB at program
+     start time.
+
+   * When `-o excmsg' is on, TLB miss addresses will be printed to
+     stderr.
+
+   * When `-o ttydev=stdout' is specified, simulated program output
+     will be sent to VMIPS's standard output, even if it is not a tty.
+
+   * The interactor can now disassemble memory. Also, stepping in the
+     interactor now prints the PC after each step.
+
+   * VMIPS now supports more of the GDB remote serial protocol, in
+     support of the GDB `info threads' and `detach' commands. The debug
+     protocol TCP port is now configurable via the `-o debugport'
+     option. Also, if something halts the program while the debugger
+     interface is active, VMIPS will tell GDB that the program exited.
+
+   * Bug fixes:
+
+   * A bug was fixed in the debugger interface where disconnecting from
+     the debugger socket could cause vmips to enter an infinite loop.
+
+   * The interactor will refuse to dump raw memory words at
+     non-word-aligned addresses.
+
+   * The CP0 Cause register IP field is now recomputed whenever the
+     register is read, rather than only when exceptions happen. This
+     makes polling loops with interrupts disabled work correctly.
+
+   * A bug was fixed in the DECstation-compatible clock device which was
+     preventing some of its registers from being zeroed properly.
+
+   * Some endianness bugs were fixed in the generic memory-mapped device
+     code and in the DECstation-compatible serial device.
+
+   vmips-1.4.1 was released on 7 May 2013.  User-visible changes in
+version 1.4.1 (since version 1.4):
+
+   * Problems compiling VMIPS with gcc 4.7.x have been fixed.
+
+   * An error has been fixed in the documentation regarding the
+     installed location of the canned setup code.
+
+   * An error has been fixed in the Makefiles which was preventing the
+     canned setup code from being installed.
+
+   * An error has been fixed in the Makefiles which was preventing
+     CFLAGS and LDFLAGS from being set correctly in some cases.
+
+   vmips-1.4 was released on 29 January 2012.  User-visible changes in
+version 1.4 (since version 1.3.2):
+
+   * A new interaction facility was implemented. This allows you to
+     suspend the simulation, print registers and memory, and then
+     continue by running or single-stepping, without needing to use a
+     full-fledged debugger.
+
+   * Some of the memory-mapped I/O devices have had endianness bugs
+     fixed and debugging printouts removed.
+
+   * Certain coprocessor zero branch instructions no longer
+     unnecessarily cause reserved instruction exceptions.
+
+   * Other minor optimizations.
+
+   vmips-1.3.2 was released on 27 March 2007.  User-visible changes in
+version 1.3.2 (since version 1.3.1):
+
+   * A bug was fixed in the code which responded to address-translation
+     exceptions by loading the CP0 Context register. It was loading the
+     wrong virtual page number.
+
+   * Problems compiling VMIPS with gcc 4.1.x have been fixed.
+
+
+   vmips-1.3.1 was released on 5 January 2005.  User-visible changes in
+version 1.3.1 (since version 1.3):
+
+   * VMIPS now compiles and passes most of its regression tests under
+     Microsoft Windows using Cygwin. There is one known failure
+     (misc-tests/echo), but the failure stems from the testsuite, not
+     VMIPS; I suspect that my old version of Expect is at fault.
+
+   * The build status report script, `buildstat.sh', has been removed
+     from the distribution.  (Since it was broken in version 1.3 and no
+     one complained, we're assuming that no one will miss it much!)
+
+   * Two bugs in the testsuite that could have led to spurious test
+     failures have been fixed.
+
+   vmips-1.3 was released on 8 October 2004.  User-visible changes in
+version 1.3 (since version 1.2.2):
+
+   * The VMIPS code base has been cleaned up substantially. The most
+     important visible effect of this is that VMIPS compiles much more
+     quickly now.
+
+   * A new, experimental executable-file loader has been integrated.
+     Presently it is only usable for loading ECOFF files into the
+     kernel segments (0x80000000-0xbfffffff). The ROM monitor has a new
+     `call' command you can use to take advantage of this.
+
+   * Vmipstool can now disassemble binary instructions from the command
+     line, e.g.  `vmipstool --disassemble-word <pc> <instr>'.
+
+   * The `excmsg' option used to report all exceptions, including
+     things like clock interrupts. This made using `excmsg' in any
+     nontrivial kernel code almost impossible. Now you must also specify
+     'reportirq' to get reports of interrupt exceptions.
+
+   * The `haltjrra' option has been removed.
+
+   * The DECstation 5000/200-compatible CSR device now supports delivery
+     of interrupts from devices attached to CSR interrupt lines, such
+     as the DZ11 serial device.
+
+   * The DZ11 serial device now supports interrupt-driven I/O properly.
+     It previously only worked correctly if polling was used.
+
+   * The documentation has received the usual slight adjustments. In
+     addition, the test-suite documentation has been extensively
+     revised and integrated into the programmer's manual.
+
+   * The options-processing code has been revised slightly to print a
+     better error message when an invalid option is specified.
+
+   vmips-1.2.2 was released on 23 August 2004.  User-visible changes in
+version 1.2.2 (since version 1.2.1):
+
+   * A bug in the Makefiles and configure scripts has been fixed, where
+     some files would not be installed if you didn't configure with
+     cross compilation tools (using `--with-mips').
+
+   * Vladimir Machulsky found and fixed a bug in the debugger interface,
+     where the register file would be sent to gdb incorrectly. Thanks!
+
+   * VMIPS will no longer abort and dump core when bad command-line
+     rguments are passed to it.  Instead, it will print an error
+     message and exit with a non-zero exit code.
+
+   * A bug in the command-line option processor was fixed, where using a
+     completely empty `~/.vmipsrc' or the `-F /dev/null' option could
+     cause the options parser to parse garbage, usually resulting in
+     harmless, but annoying error messages.
+
+   vmips-1.2.1 was released on 26 July 2004.  User-visible changes in
+version 1.2.1 (since version 1.2):
+
+   * Fixed a bug where delay slot execution could be triggered even when
+     emulating a malformed jr (jump-register) instruction.
+
+   * Fixed a bug where, upon taking a TLB Miss exception, the ASID of
+     the page that could not be looked up would be overwritten (in the
+     CP0 EntryHi register) with garbage.
+
+   * Fixed a bug in VMIPS configurations with multiple interrupt
+     devices, where Interrupt Pending bits of the CP0 Cause from
+     previous interrupts could be left asserted even if the device that
+     asserted them had subsequently deasserted them.
+
+   * Fixed a bug where the memory dump file and ROM file would be opened
+     in text mode. They are now opened in binary mode.
+
+   vmips-1.2 was released on 26 June 2004.  User-visible changes in
+version 1.2 (since version 1.1.3):
+
+   * Many documentation updates have been made. Note that the
+     documentation has been relicensed under the MIT license, instead
+     of the GNU FDL.
+
+   * Many facets of VMIPS are now configurable at runtime, instead of at
+     compile time. For instance:
+
+     	It is now possible to build and install VMIPS without having
+     previously installed MIPS cross-compiler tools. In particular,
+     VMIPS now incorporates the portions of GNU libopcodes used to
+     implement the MIPS disassembler, so linking against an installed
+     version of libopcodes from GNU binutils is no longer necessary.
+
+     	It is now possible to switch the VMIPS CPU from big-endian to
+     little-endian mode or vice-versa using a command-line option.
+
+     	It is now possible to change the name of the configuration file
+     that VMIPS reads on startup using a command-line option. The `-o
+     configfile' option, which never worked, has been removed.
+
+   * vmipstool now shares command-line processing code with vmips. It
+     also has a new -swap-words option that allows you to byteswap all
+     the 4-byte words in a file.
+
+   * You can now specify numeric constants in command line options which
+     are multiples of 1024, 1024^2, or 1024^3 using the K, M, or G
+     suffixes.
+
+   * Several new emulated devices based on the DECstation 5000/200 have
+     been added.  In particular, it is no longer possible to disable
+     the serial device at compile time (or with `-o nousetty'), but you
+     can choose whether to use the DECstation serial chip or the
+     SPIM-compatible serial console (or neither) using new command-line
+     options. In addition, the ROM program distributed with VMIPS
+     supports a "boot environment" similar to that provided by the
+     DECstation PROM. The new DECstation-compatible devices have not
+     been comprehensively validated; they should be considered "beta"
+     quality at this point.
+
+   * There is a new tracing framework you can use to generate runtime
+     execution traces of programs that run in VMIPS. See the
+     documentation of the "tracing" command-line option and the other
+     options that begin with "trace" for more details.
+
+   * The VMIPS interface to GDB now supports the "remote Z-packet"
+     interface for setting breakpoints.
+
+   * VMIPS now prints more informative diagnostic messages about the
+     causes of bus errors and interrupts.
+
+   * You can now use ^C (your terminal's Interrupt key) to stop VMIPS
+     and break into the debugger, if the `-o debug' command line option
+     was set, or ^\ (your terminal's Quit key) to halt VMIPS in an
+     orderly manner at any time.
+
+   * The `--disable-debug' option to `configure' now strips the
+     compiled VMIPS binaries, although it has been documented to do
+     this for some time now.
+
+   vmips-1.1.3 was released on 24 October 2003.  User-visible changes
+in version 1.1.3 (since version 1.1.2):
+
+   * A bug in comparing large immediate constants near UINT_MAX using
+     the sltiu instruction has been fixed.
+
+   * A bug where the meaning of the `dirty' bit in TLB entries was
+     accidentally reversed has been fixed.
+
+   * A bug in specifying which bits are treated as writable in the CP0
+     EntryLo register by the tlbr instruction has been fixed. Thanks to
+     Mingyu Chen for pointing out these last two bugs.
+
+   vmips-1.1.2 was released on 20 August 2003.  User-visible changes in
+version 1.1.2 (since version 1.1.1):
+
+   * An instruction that turns on interrupts in the system control
+     coprocessor   (coprocessor 0) will no longer immediately take an
+     exception if an interrupt   is pending; now it will happen at
+     least one instruction later.
+
+   * When building VMIPS in debug mode, the coprocessor 0 Cause
+     register may no   longer contain random, non-clearable
+     interrupt-pending bits.
+
+   * The coprocessor 0 Cause register's interrupt-pending and
+     coprocessor-error   bits are now correctly updated when an
+     exception is taken.
+
+   * The VMIPS physical-memory manager will now allow you to place two
+     devices   directly adjacent to one another in memory; it used to
+     complain that they   overlapped, when they actually did not.
+
+   * A typo was fixed in the testsuite documentation.
+
+   vmips-1.1.1 was released on 16 June 2003.  User-visible changes in
+version 1.1.1 (since version 1.1):
+
+   * A bug involving shifts by 0 or 32 bits (e.g., using instructions
+     like srlv)   producing incorrect results has been fixed.
+
+   * The absence of an FPU attached to coprocessor slot 1 can now be
+     detected by user programs.
+
+   * The system control coprocessor (coprocessor 0) now returns the
+     correct ID   number for the R3000A processor in the PRId register.
+
+   * Emulation of store-byte and store-halfword operations for emulated
+     devices   that only support store-word should now work correctly
+     on byte-swapped   configurations.
+
+   * A bug in vmipstool which caused it to fail to find alternate
+     linker scripts   (supplied with the -ld-script option) has been
+     fixed.
+
+   * A gcc warning caused by a (harmless) comment in asm_regnames.h has
+      been quashed.
+
+   * A bug where little-endian vmips configurations would dump core when
+      the disassembler was used (e.g., when the instdump option was
+     turned on)   has been fixed.
+
+   * `configure' no longer ignores its -with-mips-include option.
+
+   vmips-1.1 was released on 14 March 2003.  User-visible changes in
+version 1.1 (since version 1.0.4):
+
+   * If you are using g++ to compile VMIPS, you must use g++ version
+     2.95   or later. Also, you must specify the -target option to
+     `configure',   with an argument that matches the -target option to
+     binutils   `configure'. See `INSTALL'.
+
+   * VMIPS now supports GNU standard -help and -version options.
+
+   * The manual now includes improved documentation for using gdb and
+     Insight to control VMIPS, a section on the differences between
+     SPIM's   console and the SPIM-compatible console device, a section
+     on proper   error reporting from VMIPS extensions, and many other
+     minor   revisions.
+
+   * Using gdb to control VMIPS is now much more robust in the face of
+     errors and exceptions.
+
+   * VMIPS 1.1 makes it possible to use the 2nd display/keyboard channel
+      of the SPIM-compatible console device, using the `ttydev2' option.
+
+   * VMIPS now includes a halt device, which can be used to halt the
+     simulator without using a special instruction.
+
+   * VMIPS 1.1 is much faster than VMIPS 1.0.4. This is due in large
+     part   to the efforts of Paul Twohey, who reimplemented the clock
+     and   SPIM-compatible console devices, and cleaned up the code a
+     bit.
+
+   * The VMIPS distribution now includes a regression test suite, based
+     on   DejaGNU (replaces the old test_code directory). In order to
+     support   this, the formats of lots of random messages that VMIPS
+     prints out   have changed.
+
+   * We now support 64-bit hosts (e.g., Alpha).
+
+   vmips-1.0.4 was released on 28 April 2002.  User-visible changes in
+version 1.0.4 (since version 1.0.3):
+
+   * Fixed bug where the first instruction of an interrupt handler
+     would be   executed twice in a row. Thanks to Paul Twohey.
+
+   * Workaround some problems in the way casts are used in VMIPS by
+     specifying   -fno-strict-aliasing to gcc in configure; this should
+     help avoid   miscompilations for now, until the code can be
+     rewritten for cast-safety.
+
+   * Fix bug where vmips would dereference a NULL pointer when trying
+     to use a   SPIMConsole device with a non-attached serial host.
+     Thanks to Paul Twohey.
+
+   * Reorder some tests in the SPIMConsole code for a slight speedup
+     when   interrupts are turned off.
+
+   * Fix bug where virtual page numbers were being incorrectly
+     interpreted   by the system control coprocessor, resulting in
+     excess TLB misses being   generated. Thanks to Sanjeev Datla.
+
+   vmips-1.0.3 was released on 12 January 2002.  User-visible changes
+in version 1.0.3 (since version 1.0.2):
+
+   * Fixed bug in debugger interface; TLB translations caused by the
+     debugger   trying to access user space could fail if the virtual
+     page number was   not 0.
+
+   * Fixed bugs in the following instructions: lb, lh, lwr, lwl, swr,
+     swl, nor.
+
+   * Clarified some especially confusing comments in the source code,
+     in one of the test cases, and in the testsuite README.
+
+   * The sample setup code now halts on all exceptions, including user
+     TLB   miss exceptions.
+
+   * Fixed some warnings compiling xmboot using recent versions of gcc.
+
+   vmips-1.0.2 was released on 17 December 2001.  User-visible changes
+in version 1.0.2 (since version 1.0.1):
+
+   * Add warning message to man page directing the interested reader to
+     the   Info manual.
+
+   * New default handling of `-o ttydev' option; manual updated.
+
+   * /etc/vmipsrc contains only comments by default.    These two fixes
+     work around a bug in Darwin select(2)'s tty handling.
+
+   * Only print host processor endianness if `-o bootmsg' is set.
+     Fixes bug where `-o bootmsg' should (but doesn't) turn this
+     message off.
+
+   * Remove test_code/testdev.S from the branch.    This is a test for
+     a feature (TestDev) which wasn't distributed with 1.0.x.
+
+   * Comment out extra tokens after #endif in
+     test_code/{sort.c,tester.c}.    Fixes bug where gcc 3.0 gives
+     warnings compiling these files.
+
+   vmips-1.0.1 was released on 27 November 2001.  User-visible changes
+in version 1.0.1 (since version 1.0):
+
+   * Fixed format-string bug in vmipstool.
+
+   * Fixed "extra tokens after #endif" warning in
+     sample_code/asm_regnames.h.
+
+   vmips-1.0 was released on 28 October 2001.  User-visible changes in
+version 1.0 (since version 0.9):
+
+   * A standard clock device has been added.
+
+   * The "vmipstool" front end to compilation tools was added, and most
+     of   the random scripts lying around have been consolidated into
+     it.
+
+   * The memory-mapped test device known as "TestDev" has been removed.
+
+   * Debian and Red Hat packaging files have been added.
+
+   * The installation procedure has been greatly improved.
+
+   * The VMIPS manual has been completed.
+
+   * Many, many bugs fixed as a result of a concerted attempt at testing
+      everything.  Doubtless, some bugs still remain.
+
+   * Some portability fixes.
+
+   * Dumping of the stack (when registers are dumped) now works.
+
+   * Many strange messages the debugger backend used to print out have
+     been   quelled. Also, killing the debugger connection should no
+     longer cause   a crash.
+
+   * vmips now supports -help, -version and -print-config command-line
+     options.
+
+   * The SPIM-compatible console device now works better when the host
+     machine is byte-swapped with respect to the MIPS target.
+
+   vmips-0.9 was released on 9 May 2001.  User-visible changes in
+version 0.9 (since version 20001014):
+
+   * vmips.debug is no longer built.
+
+   * Read-only memory is now really read-only.  This allowed us to add
+     debugger support for breakpoints in ROM.
+
+   * Debugger support for exception handling - CPU exceptions are now
+     delivered to your GDB, if it is attached, giving you a chance to
+     poke   around before the target is made aware of the condition.
+
+   * Many tasty configury updates, making it easier to build.
+
+   * Miscellaneous bugs fixed in many places.
+
+   * Branch on coprocessor 0 instructions now have defined behavior.
+
+   * Many places which erroneously had text after #endif in the source
+     have   been corrected to use comments instead, allowing you to
+     compile vmips   with newer C++ compilers.
+
+   * Some old test code that used to run at the beginning of every vmips
+      job has been removed, so you will no longer see the familiar
+     messages   it printed out.
+
+   User-visible changes since version 20000517:
+
+   * Emulating a little-endian MIPS on a big-endian host passes
+     preliminary   tests.  Build process queries MIPS tools for their
+     endianness   automatically.  Builds tested on Solaris SPARC, i386
+     Linux, FreeBSD   and HP-UX.  Distribution building (gmake
+     distcheck) almost works.
+
+   User-visible changes since version 19991114:
+
+   * Polling input and output via the SPIM-compatible console device
+     now work.
+
+   User-visible changes since version 19990829:
+
+   * Build processes seeks out MIPS tools; Installation documentation
+     now   briefly documents how to build cross tools.
+
+   User-visible changes since version 19990823:
+
+   * Spim console documentation completed; first attempt at spim
+     console code.
+
+   User-visible changes since version 19990801:
+
+   * Documentation Makefile.in has been built.
+
+   * Some documentation has been updated.
+
+   * VMIPS is being adapted to use GNU Autoconf and Automake.
+

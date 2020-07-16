@@ -1,0 +1,7 @@
+OPTIONS: -o excmsg -o noinstdump -o nobootmsg
+EXPECTED OUTPUT FOLLOWS:
+Exception 4 (Address error exception (load or instr fetch)) triggered, EPC=bfc00004
+ Priority is 5; delay state is NORMAL; mem access mode is data load
+* BREAK instruction reached -- HALTING *
+Exception 9 (Breakpoint32 exception (BREAK instr)) triggered, EPC=bfc00180
+ Priority is 4; delay state is NORMAL; mem access mode is not applicable

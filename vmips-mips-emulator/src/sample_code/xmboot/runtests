@@ -1,0 +1,77 @@
+#!/bin/sh
+
+begin_tests () {
+	echo ''
+	echo '		=== xmboot tests ==='
+	echo ''
+	npass=0
+	nfail=0
+}
+
+end_tests () {
+	echo ''
+	echo '		=== xmboot Summary ==='
+	echo ''
+	echo "# of expected passes		$npass"
+	echo "# of unexpected failures		$nfail"
+	echo ''
+}
+
+pass () {
+	echo "PASS: $1"
+	npass=`expr 1 + $npass`
+}
+
+fail () {
+	echo "FAIL: $1"
+	nfail=`expr 1 + $nfail`
+}
+
+try_make () {
+	if [ ! -x $1 ]
+	then
+		make $1 > /dev/null 2>&1
+		if [ $? -ne 0 ]
+		then
+			echo "WARNING: Could not make $1"
+		fi
+	fi
+}
+
+begin_tests
+
+# test module: bootenv, using test code: testbootenv, on platform: host
+try_make testbootenv
+./testbootenv < /dev/null > foo 2>&1
+if diff -q foo testbootenv.output
+then
+	pass testbootenv
+else
+	fail testbootenv
+fi
+rm -f foo
+
+# test module: lib, using test code: libtest, on platform: host
+try_make libtest
+./libtest < libtest.input > foo 2>&1
+if diff -q foo libtest.output
+then
+	pass libtest
+else
+	fail libtest
+fi
+rm -f foo
+
+# test module: lib, using test code: pftest, on platform: host
+try_make pftest
+./pftest < /dev/null > foo 2>&1
+if diff -q foo pftest.output
+then
+	pass pftest
+else
+	fail pftest
+fi
+rm -f foo
+
+end_tests
+exit 0

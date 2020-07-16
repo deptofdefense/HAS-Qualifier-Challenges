@@ -1,0 +1,348 @@
+@option{haltdumpcpu} (type: Boolean)
+
+ Controls whether the CPU registers and stack will be dumped
+on halt. For the output format, please see the description of the
+@option{dumpcpu} option, below.  The default value is FALSE.
+
+@option{haltdumpcp0} (type: Boolean)
+
+ Controls whether the system control coprocessor (CP0) registers
+and the contents of the translation lookaside buffer (TLB) will be
+dumped on halt. For the output format, please see the description
+of the @option{dumpcp0} option, below.  The default value is FALSE.
+
+@option{excpriomsg} (type: Boolean)
+
+ Controls whether exception prioritizing messages will
+be printed.  These messages attempt to explain which of
+a number of exceptions caused by the same instruction
+will be reported.  The default value is FALSE.
+
+@option{excmsg} (type: Boolean)
+
+ Controls whether every exception will cause a message
+to be printed. The message gives the exception code, a
+short explanation of the exception code, its priority,
+the delay slot state of the virtual CPU, and states
+what type of memory access the exception was caused by,
+if applicable. Interrupt exceptions are only printed if
+@option{reportirq} is also set; when they occur, they also have Cause
+and Status register information printed. TLB misses will have fault
+address and user/kernel mode information printed.  The default value is FALSE.
+
+@option{bootmsg} (type: Boolean)
+
+ Controls whether boot-time and halt-time messages will be printed.
+These include ROM image size, self test messages, reset and halt
+announcements, and possibly other messages.  The default value is TRUE.
+
+@option{instdump} (type: Boolean)
+
+ Controls whether every instruction executed will be disassembled
+and printed.  The default value is FALSE. The output is in the following format:
+@example
+PC=0xbfc00000 [1fc00000]    24000000 li $zero,0
+@end example
+The first column contains the PC (program counter), followed by
+the physical translation of that address in brackets. The third
+column contains the machine instruction word at that address,
+followed by the assembly language corresponding to that word.
+All of the constants except for the assembly language are in
+hexadecimal. 
+
+@option{dumpcpu} (type: Boolean)
+
+ Controls whether the CPU registers and stack will be dumped after every
+instruction.  The default value is FALSE. The output is in the following format:
+@example
+Reg Dump: [ PC=bfc00180  LastInstr=0000000d  HI=00000000  LO=00000000
+            DelayState=NORMAL  DelayPC=bfc00308  NextEPC=bfc00308
+ R00=00000000  R01=00000000  R02=00000000  R03=a00c000e  R04=0000000a 
+ ...
+ R30=00000000  R31=bfc00308  ]
+Stack: 00000000 00000000 00000000 00000000 a2000008 a2000008 ...
+@end example
+
+(Some values have been omitted for brevity.)
+Here, PC is the program counter, LastInstr is the last instruction
+executed, HI and LO are the multiplication/division result registers,
+DelayState and DelayPC are used in delay slot processing, NextEPC
+is what the Exception PC would be if an exception were to occur, and
+R00 ... R31 are the CPU general purpose registers. Stack represents
+the top few words on the stack.  All values are in hexadecimal.  
+
+@option{dumpcp0} (type: Boolean)
+
+ Controls whether the system control coprocessor (CP0)
+registers and the contents of the translation lookaside buffer
+(TLB) will be dumped after every instruction.   The default value is FALSE.
+The output is in the following format:
+@example
+CP0 Dump Registers: [        R00=00000000  R01=00003200 
+ R02=00000000  R03=00000000  R04=001fca10  R05=00000000 
+ R06=00000000  R07=00000000  R08=7fb7e0aa  R09=00000000 
+ R10=00000000  R11=00000000  R12=00485e60  R13=f0002124 
+ R14=bfc00308  R15=0000703b ]
+Dump TLB: [
+Entry 00: (00000fc000000000) V=00000 A=3f P=00000 ndvg
+Entry 01: (00000fc000000000) V=00000 A=3f P=00000 ndvg
+Entry 02: (00000fc000000000) V=00000 A=3f P=00000 ndvg
+Entry 03: (00000fc000000000) V=00000 A=3f P=00000 ndvg
+Entry 04: (00000fc000000000) V=00000 A=3f P=00000 ndvg
+Entry 05: (00000fc000000000) V=00000 A=3f P=00000 ndvg
+...
+Entry 63: (00000fc000000000) V=00000 A=3f P=00000 ndvg
+]
+@end example
+Each of the R00 .. R15 are coprocessor zero registers, in
+hexadecimal.  The Entry 00 .. 63 lines are TLB entries. The 64-bit
+number in parentheses is the hexadecimal raw value of the entry. V
+is the virtual page number. A is the ASID. P is the physical page
+number. NDVG are the Non-cacheable, Dirty, Valid, and Global bits,
+uppercase if on, lowercase if off.  
+
+@option{haltibe} (type: Boolean)
+
+ If @option{haltibe} is set to TRUE, the virtual machine will halt
+after an instruction fetch causes a bus error (exception
+code 6, Instruction bus error). This is useful if you
+are expecting execution to jump to nonexistent addresses in
+memory, and you want it to stop instead of calling the
+exception handler.  It is important to note that the machine
+halts after the exception is processed.  The default value is TRUE.
+
+@option{haltbreak} (type: Boolean)
+
+ If @option{haltbreak} is set to TRUE, the virtual machine will halt
+when a breakpoint exception is encountered (exception
+code 9). This is equivalent to halting when a @code{break}
+instruction is encountered. It is important to note that the
+machine halts after the breakpoint exception is processed.  The default value is TRUE.
+
+@option{haltdevice} (type: Boolean)
+
+ If @option{haltdevice} is set to TRUE, the halt device is mapped into
+physical memory, otherwise it is not.  The default value is TRUE.
+
+@option{instcounts} (type: Boolean)
+
+ Set @option{instcounts} to TRUE if you want to see instruction
+counts, a rough estimate of total runtime, and execution
+speed in instructions per second when the virtual
+machine halts.  The default value is FALSE.  The output is printed
+at the end of the run, and is in the following format:
+@example
+7337 instructions in 0.0581 seconds (126282.271 instructions per second)
+@end example
+
+
+@option{romfile} (type: string)
+
+ This is the name of the file which will be initially
+loaded into memory (at the address given in @option{loadaddr},
+typically 0xbfc00000) and executed when the virtual
+machine is reset.  The default value is "romfile.rom".
+
+@option{loadaddr} (type: number)
+
+ This is the virtual address where the ROM will be loaded.
+Note that the MIPS reset exception vector is always 0xbfc00000
+so unless you're doing something incredibly clever you should
+plan to have some executable code at that address. Since the
+caches and TLB are in an indeterminate state at the time of
+reset, the load address must be in uncacheable memory which
+is not mapped through the TLB (kernel segment "kseg1"). This
+effectively constrains the valid range of load addresses to
+between 0xa0000000 and 0xc0000000.  The default value is 0xbfc00000.
+
+@option{memsize} (type: number)
+
+ This variable controls the size of the virtual CPU's "physical"
+memory in bytes.  The default value is 0x100000.
+
+@option{memdump} (type: Boolean)
+
+ If @option{memdump} is set, then the virtual machine will dump its RAM
+into a file, whose name is given by the @option{memdumpfile} option,
+at the end of the simulation run.  The default value is FALSE.
+
+@option{memdumpfile} (type: string)
+
+ This is the name of the file to which a RAM dump will be
+written at the end of the simulation run.  The default value is "memdump.bin".
+
+@option{reportirq} (type: Boolean)
+
+ If @option{reportirq} is set, then any change in the interrupt
+inputs from a device will be reported on stderr. Also, any
+Interrupt exception will be reported, if @option{excmsg} is also
+set.  The default value is FALSE.
+
+@option{spimconsole} (type: Boolean)
+
+ When set, configure the SPIM-compatible console device.
+This is incompatible with @option{decserial}.  The default value is TRUE.
+
+@option{ttydev} (type: string)
+
+ This pathname will be used as the device from which reads from the
+SPIM-compatible console device's Keyboard 1 will take their data, and
+to which writes to Display 1 will send their data. If the OS supports
+ttyname(3), that call will be used to guess the default pathname.
+If the pathname is the single word @samp{off}, then the device will be
+disconnected.
+If the pathname is the single word @samp{stdout}, then the device
+will be connected to standard output, and input will be disabled.  The default value is "/dev/tty".
+
+@option{ttydev2} (type: string)
+
+ See @option{ttydev} option; this one is just like it, but pertains
+to Keyboard 2 and Display 2.   The default value is "off".
+
+@option{debug} (type: Boolean)
+
+ If debug is set, then the gdb remote serial protocol backend will
+be enabled in the virtual machine. This will cause the machine to
+wait for gdb to attach and @samp{continue} before booting the ROM file.
+If debug is not set, then the machine will boot the ROM file
+without pausing.  The default value is FALSE.
+
+@option{debugport} (type: number)
+
+ If debugport is set to something nonzero, then the gdb remote
+serial protocol backend will use the specified TCP port.  The default value is 0.
+
+@option{realtime} (type: Boolean)
+
+ If @option{realtime} is set, then the clock device will cause simulated
+time to run at some fraction of real time, determined by the
+@option{timeratio} option. If realtime is not set, then simulated time
+will run at the speed given by the @option{clockspeed} option.   The default value is FALSE.
+
+@option{timeratio} (type: number)
+
+ If the @option{realtime} option is set, this option gives the
+number of times slower than real time at which simulated time will
+run. It has no effect if @option{realtime} is not set.  The default value is 1.
+
+@option{clockspeed} (type: number)
+
+ If the @option{realtime} option is not set, you should set this
+option to the average speed in MIPS instructions per second at which
+your system runs VMIPS. You can get suitable values from turning
+on the @option{instcounts} option and running some of your favorite
+programs. If you increase the value of @option{clockspeed}, time will
+appear to pass more slowly for the simulated machine; if you decrease
+it, time will pass more quickly. (To be precise, one instruction is
+assumed to take 1.0e9/@option{clockspeed} nanoseconds.) This option
+has no effect if @option{realtime} is set.  The default value is 250000.
+
+@option{clockintr} (type: number)
+
+ This option gives the frequency of clock interrupts, in nanoseconds
+of simulated time, for the clock device. It does not affect the
+DECstation-compatible realtime clock.  The default value is 200000000.
+
+@option{clockdeviceirq} (type: number)
+
+ This option gives the interrupt line to which the clock device is
+connected. Values must be a number 2-7 corresponding to an interrupt
+line reserved for use by hardware.  The default value is 7.
+
+@option{clockdevice} (type: Boolean)
+
+ If this option is set, then the clock device is enabled. This will
+allow MIPS programs to take advantage of a high precision clock.  The default value is TRUE.
+
+@option{dbemsg} (type: Boolean)
+
+ If this option is set, then the physical addresses of accesses
+that cause data bus errors (DBE exceptions) will be printed.  The default value is FALSE.
+
+@option{decrtc} (type: Boolean)
+
+ If this option is set, then the DEC RTC device will be
+configured.  The default value is FALSE.
+
+@option{deccsr} (type: Boolean)
+
+ If this option is set, then the DEC CSR (Control/Status Register)
+will be configured.  The default value is FALSE.
+
+@option{decstat} (type: Boolean)
+
+ If this option is set, then the DEC CHKSYN and ERRADR registers
+will be configured.  The default value is FALSE.
+
+@option{decserial} (type: Boolean)
+
+ If this option is set, then the DEC DZ11 serial device
+will be configured. This is incompatible with @option{spimconsole}.  The default value is FALSE.
+
+@option{tracing} (type: Boolean)
+
+ If this option is set, VMIPS will keep a trace of the last few
+instructions executed in memory, and write it out when the machine
+halts.  This incurs a substantial performance penalty.  Use the
+@option{tracesize} option to set the size of the trace you want.  The default value is FALSE.
+
+@option{tracesize} (type: number)
+
+ Set this option to the maximum number of instructions to keep in the
+dynamic instruction trace. This has no effect if @option{tracing} is
+not set.  The default value is 100000.
+
+@option{bigendian} (type: Boolean)
+
+ If this option is set, then the emulated MIPS CPU will be in
+Big-Endian mode.  Otherwise, it will be in Little-Endian mode. You
+must set it to correspond to the type of binaries that your
+assembler and compiler are configured to produce, which is not
+necessarily the same as the endianness of the CPU on which you
+are running VMIPS.  (The default may not be meaningful for your
+setup!)  The default value is FALSE.
+
+@option{tracestartpc} (type: number)
+
+ If the tracing option is set, then this is the PC value which will
+trigger the start of tracing.  Otherwise it has no effect.  The default value is 0.
+
+@option{traceendpc} (type: number)
+
+ If the tracing option is set, then this is the PC value which will
+trigger the end of tracing. Otherwise it has no effect.  The default value is 0.
+
+@option{mipstoolprefix} (type: string)
+
+ vmipstool uses this option to locate your MIPS-targetted cross
+compilation tools, if you have them installed. If your MIPS GCC
+is installed as /opt/mips/bin/mips-elf-gcc, then you should set
+this option to "/opt/mips/bin/mips-elf-". vmipstool looks for
+the "gcc", "ld", "objcopy" and "objdump" programs starting with
+this prefix. This option should be set in your installed
+system-wide VMIPS configuration file (vmipsrc) by the "configure"
+script; the compiled-in default is designed to cause an error.  The default value is "/nonexistent/mips/bin/mipsel-ecoff-".
+
+@option{execname} (type: string)
+
+ Name of executable to be loaded by automatic kernel loader. This
+is an experimental, unfinished feature. The option value
+must be the name of a MIPS ECOFF executable file, or 'none'
+to disable the option.  The executable's headers must specify
+load addresses in KSEG0 or KSEG1 (0x80000000 through
+0xbfffffff).   The default value is "none".
+
+@option{fpu} (type: Boolean)
+
+ True to enable hooks in the CPU to communicate with a
+floating-point unit as coprocessor 1. The floating-point unit
+is not implemented; only the hooks in the CPU are. This is an
+experimental, unfinished feature.  The default value is FALSE.
+
+@option{testdev} (type: Boolean)
+
+ True to enable a memory-mapped device that is used to test
+the memory-mapped device interface. The VMIPS test suite turns
+this device on as necessary; you should not normally need
+to enable it.  The default value is FALSE.
+

@@ -1,0 +1,9 @@
+# BUILD RULES: testcase_simple_asm -setup 1 cisol
+regcheck_set_results {
+    R08 80001000
+    R09 80011000
+    R10 12345678
+    R11 fffeffff
+    R13 12345678
+    R14 12345678
+}

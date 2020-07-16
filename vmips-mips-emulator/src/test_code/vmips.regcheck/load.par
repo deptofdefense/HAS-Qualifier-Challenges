@@ -1,0 +1,13 @@
+if {[vmips_target_endian] == "little"} {
+	regcheck_set_results { R09 deadbeef \
+	                       R10 ffffbeef \
+	                       R11 ffffffef \
+	                       R12 0000beef \
+	                       R13 000000ef }
+} elseif {[vmips_target_endian] == "big"} {
+	regcheck_set_results { R09 deadbeef \
+	                       R10 ffffe234 \
+	                       R11 ffffffe2 \
+	                       R12 0000e234 \
+	                       R13 000000e2 }
+}

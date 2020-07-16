@@ -1,0 +1,15 @@
+regcheck_set_results { \
+nextepc bfc00180 \
+pc bfc00180 \
+R04 00000001 \
+R05 ffffffff \
+R06 00000000 \
+R07 00000002 \
+R08 80000001 \
+R09 7fffffff \
+R10 00000002 \
+R11 fffffffe \
+R12 00000000 \
+R13 fffffffe \
+R14 00000000 \
+}

@@ -1,0 +1,2952 @@
+\input texinfo      @c -*- texinfo -*-
+@c %**start of header
+@setfilename vmips.info
+@settitle VMIPS Programmer's Manual
+@c %**end of header
+@syncodeindex fn cp
+@syncodeindex pg cp
+
+@dircategory Development
+@direntry
+* VMIPS: (vmips).                A MIPS R3000 simulator.
+@end direntry
+
+@ifinfo
+This is the VMIPS Programmer's Manual, Sixth Edition, for version 1.5.
+
+Copyright @copyright{} 2001, 2002, 2004, 2009, 2014, 2018 Brian R. Gaeke.
+@end ifinfo
+
+@titlepage
+@center @titlefont{VMIPS Programmer's Manual}
+@page
+@vskip 0pt plus 1filll
+@end titlepage
+
+@node Top, Overview, , (dir)
+@top
+This is the VMIPS Programmer's Manual, Sixth Edition, for version 1.5.
+
+Copyright @copyright{} 2001, 2002, 2004, 2009, 2014, 2018 Brian R. Gaeke.
+For information about copying, modifying or distributing this manual,
+please see the chapter called `Copying'.
+
+@menu
+* Overview::              The rationale for VMIPS.
+* Getting Started::       4 simple steps to building VMIPS programs.
+* An Example::            Hello, World on VMIPS.
+
+* Building Programs::     What you need to know when compiling for VMIPS.
+* Invoking vmips::        Starting and stopping the simulation.
+* Customizing::           The @file{.vmipsrc} file.
+* Invoking vmipstool::    A handy front-end to MIPS compiler tools.
+* Programming::           Tips on writing assembly language programs.
+* Debugging::             VMIPS supports debugging with GDB.
+* Interaction::           You can inspect machine state without a debugger.
+* Devices::               Virtual hardware supported by VMIPS.
+* Monitor::               VMIPS comes with a simple ROM monitor.
+* Extending::             Writing new functionality for VMIPS.
+* Test Suite::            Making sure VMIPS works as designed on your platform.
+
+* Installation::          Getting VMIPS ready to boot on your machine.
+* Reporting Bugs::        What to do when vmips dumps core, or worse.
+* Future Directions::     VMIPS is looking for a few good hackers.
+* Release History::       Annals in the history of VMIPS.
+* References::            Good books about MIPS.
+
+* Copying::               VMIPS is free software, and its documentation
+                          is free documentation.
+
+* Index::
+@end menu
+
+@comment node-name, next,          previous, up
+@node Overview, Getting Started, Top, Top
+@chapter Overview
+
+@cindex simulator
+@cindex virtual machine
+@cindex MIPS
+@cindex MIPS R3000
+VMIPS is a simulator for a machine compatible with the MIPS R3000 RISC
+architecture. VMIPS consists entirely of software. No special hardware is
+required to run programs on VMIPS---that is, VMIPS is a virtual machine.
+
+@cindex RISC
+@cindex RISC architecture
+@cindex architecture
+Since VMIPS is based on an already-existing architecture, it is relatively
+easy to find tools to build programs that will run on VMIPS. Since VMIPS is
+based on a RISC architecture, its primitive machine-language commands are
+all fairly simple to understand and implement.
+
+VMIPS is easily extended by programmers to include more virtual devices,
+such as frame buffers, disk drives, etc. VMIPS is written in C++ and uses
+a fairly simple class structure. Furthermore, VMIPS is intended to be a
+``concrete'' virtual machine which its users can modify at will---``concrete''
+meaning that it maintains a tight correspondence between its structures
+and structures which actually appear in modern physical computer hardware.
+For example, a programmer who wished to modify the CPU simulation could
+easily extract the @code{CPU} class from the VMIPS source code, and replace
+it with one which was more to his/her liking.
+
+@cindex debugger
+@pindex gdb
+VMIPS is also designed with debugging and testing in mind, offering an
+interface to the GNU debugger GDB by which programs can be debugged while
+they run on the simulator. As such, it is intended to be a practical
+simulator target for compilers and assembly language/hardware-software
+interface courses.
+
+@cindex free software
+VMIPS is free software. This means that you are free to share VMIPS
+with everyone, and we encourage you to do so, but we do not give you
+the freedom to restrict others from sharing it with everyone. For a
+comprehensive explanation please read the GNU General Public License.
+
+@node Getting Started, An Example, Overview, Top
+@chapter Getting Started
+
+Step 0. If VMIPS is installed on your system, you can start building
+programs with it right away.  Otherwise, you (or your system
+administrator) will have to compile VMIPS first; see the appendix on
+Installation.
+
+@cindex vmipstool usage
+@pindex vmipstool
+@pindex vmips
+Step 1. First, compile your program. You should have a MIPS cross-compiler
+available.  VMIPS supports the GNU C Compiler; most installations of
+VMIPS will also have an installation of the GNU C Compiler targetting
+the MIPS architecture.  Your easiest interface to the C compiler will
+probably be through the @samp{vmipstool} program; to run the MIPS compiler
+that VMIPS was installed with, use the @samp{vmipstool --compile} command.
+
+@cindex linking, using vmipstool
+@cindex script, linker
+Step 2. Link your program with any support code necessary. VMIPS comes
+with some canned support code, in the share/vmips directory, or you
+can write your own support code. VMIPS comes with a linker script for
+simple standalone programs, which you can run with @samp{vmipstool --link},
+or you can write your own linker script.
+
+@cindex ROM, building with vmipstool
+Step 3. Build a ROM image. This is necessary because the current version of
+VMIPS does not read in executables. Most real machines don't; they have
+an embedded program on a piece of flash ROM that reads in the first
+executable and runs it. This makes development a little more realistic, but
+not quite so convenient; this may change in the future, but for now it's
+necessary. To build a ROM image, use the script that comes with VMIPS, by
+running @samp{vmipstool --make-rom}.
+
+@cindex simulation, starting
+Step 4. Start the simulator using @samp{vmips ROMFILE}, where @samp{ROMFILE} is
+the name of your ROM image.  Your program should run to completion,
+and if you are using the canned setup code that comes with VMIPS, 
+the simulator should halt when it hits the first @code{break} instruction, which
+should happen right after your @code{entry} function returns.
+
+@node An Example, Building Programs, Getting Started, Top
+@chapter An Example
+
+@pindex vmipstool 
+@pindex vmips
+Let's assume you have VMIPS already compiled, and that you have some
+setup code in @file{setup.s}, and a standalone program (i.e., not one
+meant to run under an operating system) in @file{hello.c}.
+
+@cindex assembling, using vmipstool
+First assemble the setup code.
+@example
+vmipstool --assemble -o setup.o setup.s
+@end example
+
+@cindex error, installation
+Note: if you get an `installation error' from vmipstool, you may need to edit
+your @file{/etc/vmipsrc} the first time you use vmipstool.  See the
+`Post-Installation Setup' section of the `Installation' appendix for more
+information.
+
+@cindex compiling, using vmipstool
+Compile your program:
+@example
+vmipstool --compile -c hello.c
+@end example
+
+@cindex linking, using vmipstool
+Then, link your program and the setup code together to produce an executable:
+@example
+vmipstool --link -o hello setup.o hello.o
+@end example
+
+@cindex ROM, building with vmipstool
+Build a ROM image from the executable:
+@example
+vmipstool --make-rom hello hello.rom
+@end example
+
+Run the program.
+@example
+vmips hello.rom
+@end example
+
+@cindex simulation, halting
+The program will terminate, by default, when your setup code generates
+a breakpoint exception (using the @code{break} instruction, for
+example). This termination condition can be changed by adding one of the
+@option{halt} options to the file @file{.vmipsrc} in your home directory.
+
+@node Building Programs, Invoking vmips, An Example, Top
+@chapter Building Programs
+
+@section Source Languages
+
+@cindex C language
+Programs for VMIPS are generally built out of C or assembly-language source
+code. It is theoretically possible to use C++ or other languages, but the
+infrastructure required has not yet been investigated or documented.
+
+@section ROM Programs
+
+@cindex ROM, programs in
+The easiest way to get VMIPS to run a program is to install that program as
+the VMIPS ROM. Building a C program as a ROM requires that you link it with
+some setup code.
+
+@section Default Setup Code
+
+@cindex setup code
+@cindex startup code
+@cindex initialization code
+This section describes the default VMIPS setup code.  It also describes
+the minimal set of things you need to do before you can run C code
+from the ROM, since that is the intended purpose of the default VMIPS
+setup code.
+
+@cindex TLB, initializing
+Start by clearing out registers and initializing TLB entries.
+The default VMIPS setup code sets up an identity virtual-to-physical
+address mapping in the TLB with valid entries for the first few pages
+of physical RAM.
+
+@cindex stack pointer, initializing
+Set yourself up a stack pointer ($sp). Usually this can just be some
+number of megabytes above the end of your code's data segment.  You can
+get the address of the end of your code's data segment from your linker
+script.
+
+@cindex globals pointer, initializing
+Set up your globals pointer ($gp), if your code uses global data.
+You can get the right address from your linker script.
+
+@cindex ROM, data in
+If you have writable data in ROM, your C code probably doesn't realize
+that it's in ROM, and it will want to write to it. You should copy the
+writable data to RAM. There is code to do this in the canned setup code
+provided with VMIPS.
+
+@cindex memory size
+Note: The canned setup code is hard-wired for 1 MByte of memory. It
+operates with a very simple memory map: writable data and bss
+(uninitialized data) above @code{DATA_START}, and the stack grows down
+from @code{DATA_START}.  The linker script and the canned setup code
+share some hard-wired constants related to this memory map; you should be
+careful to coordinate your changes if you wish to change the memory map.
+
+@findex main
+@findex entry
+Finally, your setup code should finish by calling the entry point of your
+C code. Usually this will have a name like @code{entry}; using the name
+@code{main} is not recommended, because many versions of GCC assume that
+they can call standard C runtime setup functions (such as are normally
+found in @file{crt0.o}) from the beginning of @code{main}. You may or
+may not want this.
+
+@cindex break instruction, to halt machine
+When the C code returns, you will probably want to halt the machine;
+the default way to do this is by executing a break instruction. Read the
+following section for details.
+
+@section Exceptions
+
+@subsection Handling exceptions
+
+@cindex exceptions, handling
+Your startup code should have some kind of exception support.  If you
+don't, exceptions are likely to make your program loop forever, because
+the jump to the exception vector will result in the execution of garbage
+or in a unmapped access, either of which are likely to cause exceptions.
+
+@cindex exceptions, minimal handler for
+@cindex break instruction, to halt machine
+An absolutely minimal exception handler is a break instruction at address
+0xbfc00180, which will halt the machine on any exception, providing
+you have the @option{haltbreak} option set. This is also a handy way to halt
+the machine after your program ends, if you are writing kernel code;
+just follow the jump to your kernel code by a @code{break} instruction.
+
+@subsection Exception vectors
+
+@cindex exceptions, vectors for
+@cindex exceptions, addresses for
+If the Boot-time Exception Vectors are in use, exceptions use the
+base address 0xbfc00100 (which is in unmapped, uncached kernel space),
+otherwise they use the base address 0x80000000 (which is in unmapped,
+cached kernel space).  You can control this by setting or clearing the
+Boot-time Exception Vector bit (bit 22, or 0x00400000) in the Status
+register (register 12 of coprocessor zero). If the bit is set, the
+Boot-time Exception Vectors will be used.
+
+@cindex exceptions, user-space TLB miss
+User-space TLB Miss exceptions have a special vector, which is obtained by
+adding 0 to the base address. All other exceptions use the general vector,
+which is obtained by adding 0x080 to the base address. This obviously
+places a bit of a restriction on the layout of the beginning of your ROM code:
+the setup code must either fit in the first 0x100 bytes, or it must be structured
+so that it jumps past the exception vectors.
+
+@subsection Exception codes and their meanings
+
+@cindex exceptions, codes for
+Whenever control is transferred to your exception handler, the ExcCode
+field of the Cause register, that is, bits 6 - 2 (0x007c) of register 13
+of coprocessor 0, are filled in with one of the following exception codes.
+Each exception code has a canonical short name, included in parentheses next
+to the exception code number, and is followed by a short description of the
+circumstances where it occurs.
+
+@table @code
+@item 0 (Int)
+Hardware or software interrupt. Some device or process is trying to get
+the processor's attention.
+
+@item 1 (Mod)
+TLB modification exception. The memory address translation mapped to a TLB
+entry, but that entry's ``dirty'' bit was set.
+
+@item 2 (TLBL)
+TLB exception caused by a data load (i.e., a load word or similar
+instruction) or instruction fetch. The memory address translation did
+not match any valid TLB entry.
+
+@item 3 (TLBS)
+TLB exception caused by a data store (i.e., a store word or similar
+instruction). The memory address translation did not match any valid TLB
+entry.
+
+@item 4 (AdEL)
+Address error exception caused by a data load or instruction fetch. The
+PC was not word-aligned, or the address the load instruction wanted to
+load from was not aligned to the width of the load instruction. (For
+example, load halfword instructions must be 2-byte aligned.)
+
+@item 5 (AdES)
+Address error exception caused by a data store. The address the store
+instruction wanted to store to was not aligned to the width of the store
+instruction. (For example, store halfword instructions must be 2-byte
+aligned.)
+
+@item 6 (IBE)
+Bus error caused by an instruction fetch. The PC does not correspond to
+any real area of memory.
+
+@item 7 (DBE)
+Bus error caused by a data load or store. The target address of the load
+or store instruction does not correspond to any real area of memory.
+
+@item 8 (Sys)
+SYSCALL exception. Some code was trying to call the operating system,
+using a SYSCALL instruction.  This exception is the processor's way of
+transferring control to the operating system.
+
+@item 9 (Bp)
+Breakpoint exception. Some process executed a BREAK instruction. This is the
+processor's way of allowing the operating system to stop the process and do
+whatever is appropriate (alert the user using the debugger, for example).
+
+@item 10 (RI)
+Reserved instruction exception. Some code executed something which wasn't
+a valid MIPS-1 instruction.
+
+@item 11 (CpU)
+Coprocessor Unusable. Some code executed an instruction which tried to
+reference a coprocessor that isn't configured in VMIPS.
+
+@item 12 (Ov)
+Arithmetic Overflow.  Some code executed an instruction whose arithmetic
+answer was too big to fit in a register using two's-complement arithmetic. The
+processor issues this exception so that the operating system can stop or
+otherwise signal the process.
+
+@item 13 (Tr)
+Trap. This exception is only issued on the R4000 or R6000 processor and
+compatibles.
+
+@item 14 (NCD)
+LDCz or SDCz (coprocessor load/store) using an address which wasn't in
+the cache. This exception is only issued on the R6000 processor and compatibles.
+
+@item 14 (VCEI)
+Virtual Coherency Exception (instruction). This exception is only issued on
+the R4000 processor and compatibles.
+
+@item 15 (MV)
+Machine check exception. This exception is only issued on
+the R6000 processor and compatibles.
+
+@item 15 (FPE)
+Floating-point exception. This exception is only issued on
+the R4000 processor and compatibles.
+
+@item 16-22
+Reserved, not used.
+
+@item 23 (WATCH)
+Reference to WatchHi/WatchLo address detected. This exception is only issued
+on the R4000 processor and compatibles.
+
+@item 24-30
+Reserved, not used.
+
+@item 31 (VCED)
+Virtual Coherency Exception (data). This exception is only issued on
+the R4000 processor and compatibles.
+@end table
+
+@subsection Exception prioritizing
+
+It is possible for more than one exception to occur during the emulation
+of the same instruction.  The MIPS architecture has a system for
+determining which of a set of conflicting exceptions is reported to
+the exception handler.
+ 
+When two or more exceptions occur on the same execution of the same
+instruction, only one is reported, according to the priority
+list, below. The ordering is by exception code (EXCCODE) and mode of memory
+access (MODE), where applicable. Each ordered pair (EXCCODE, MODE)
+below has the priority listed in brackets. * denotes a position where
+any value matches.
+
+This prioritization is implemented in the @code{exception_priority()}
+member function of class CPU.
+
+@table @code
+@item [1]
+Address error - instruction fetch 
+(AdEL, INSTFETCH)
+
+@item [2]
+TLB refill - instruction fetch
+TLB invalid - instruction fetch 
+(TLBL, INSTFETCH)
+(TLBS, INSTFETCH)
+
+@item [3]
+Bus error - instruction fetch
+(IBE, *)
+
+@item [4]
+Integer overflow, Trap, System call, Breakpoint, Reserved
+Instruction, or Coprocessor Unusable
+(Ov, *)
+(Tr, *)
+(Sys, *)
+(Bp, *)
+(RI, *)
+(CpU, *)
+
+@item [5]
+Address error - data load or data store
+(AdEL, DATALOAD)
+(AdES, *)
+
+@item [6]
+TLB refill - data load or data store
+TLB invalid - data load or data store
+(TLBL, DATALOAD)
+(TLBS, DATALOAD)
+(TLBL, DATASTORE)
+(TLBS, DATASTORE)
+
+@item [7]
+TLB modified - data store
+(Mod, *)
+
+@item [8]
+Bus error - data load or data store
+(DBE, *)
+
+@item [9]
+Interrupt
+(Int, *)
+@end table
+
+@section Linking
+
+You want the text section of your program to start with the setup
+code, so link in the setup code first --- that is, put the name of the
+object file containing the setup code first on the linker command line.
+
+You want the setup code to start at 0xbfc00000, which is the MIPS
+reset exception vector. In practical terms, when VMIPS starts up,
+it will reset. When VMIPS resets, it jumps to 0xbfc00000, which is
+the beginning of your setup code. 
+
+@section Common Errors in Compilation
+
+If the linker complains about not being able to find the
+symbol @code{_gp_disp}, you should turn on the GCC option
+@option{-mno-abicalls}. @code{_gp_disp} is used by the SGI N32 ABI for
+MIPS ELF.  One reliable reference source claims, ``@code{_gp_disp} is
+a reserved symbol defined by the linker to be the distance between the
+lui instruction and the context pointer.'' The GNU linkers currently in
+use do not appear to support this function.
+
+If you get lots of @code{R_MIPS_GPREL16} relocation failures from
+the linker, there are two workarounds: either combine all the files
+together first with @samp{ld -x -r -o bigfile.o @var{<all your files>}}
+and then use @samp{vmipstool --link} on @file{bigfile.o}, or compile
+with @option{-G 0} in your @code{CFLAGS}.
+
+@subsection Dealing with kernel code in GCC
+
+If you have a @code{main()} function in your code, GCC expects it to
+return an int.  If you don't like this, use @option{-ffreestanding}
+or @option{-Wno-main}. You have to have GCC 2.95.2 or later for this to
+work, though; it won't work in EGCS 1.1.1.
+
+If you have a @code{main()} function in your code, GCC will try to
+call @code{__main} or some other kind of setup function even if you
+use @option{-ffreestanding}.  If you don't want this call made, a
+simple workaround is to call the entry function @code{entry} instead
+of @code{main}. You can also try defining @code{void __main(void)}
+to be an empty function.
+
+@subsection MIPS position-independent code
+
+In Linux/MIPS, PIC (position-independent code) is the default.
+An important implication is that GCC configured for @code{mips-linux}
+or @code{mipsel-linux} will, by default, use the @code{$gp} register
+to access global variables. This is fine in most user programs,
+but you may find that it causes you trouble if you are writing a ROM
+for use in VMIPS because the @code{$gp} register may not contain a
+valid pointer. The easiest thing to do is turn off this behavior by
+giving gcc the @option{-fno-pic} option, which also turns on the gas
+@option{-non_shared} option.  If you compile with vmipstool, it will
+turn on these flags for you by default.
+
+In many MIPS operating systems, register @code{$t9} is reserved for the
+ABI as a globals pointer when compiling position-independent code, and
+the assembly writer (programmer or compiler) must issue @code{.cpsave}
+and @code{.cprestore} assembler directives upon function entry and exit
+to put the right globals pointer values into this register. Similarly
+to the @option{-fno-pic} option above, it is easy to turn this off while
+writing ROM code by using the gcc @option{-mno-abicalls} option. If you
+compile with vmipstool, it will turn this flag on for you by default.
+
+@subsection Building ROMs
+
+If it takes a long time to build a ROM or the ROM file fills the disk,
+make sure all the sections your linker is producing are accounted for
+in the linker script. Do an @samp{objdump -x} on the executable which
+you are using to build the ROM image, and make sure that the difference
+between any two of the LMAs (load memory addresses) of the sections
+in the file is not a lot bigger than the total size of the executable.
+This metric is strictly a rule of thumb, but it easily identifies when
+a section has not been put into the linker script: if a load memory
+address for some section is expecting to be in RAM (0xa0000000, for
+example), and the load memory address for all the other sections is in
+ROM (around 0xbfc00000), then you will lose because writing out a memory
+image to be used as a ROM file would take roughly 0xbfc00000 - 0xa0000000
+= 532676608 bytes (about 500 megs). The solution is to make sure that
+all LMAs in the executable are sane with respect to the @samp{loadaddr}
+variable in your @file{.vmipsrc}, usually by adding any new sections
+you find to either the .text, .data, or .bss section of the linker script.
+
+@c This file is where the Invoking vmips and Customizing nodes are to be
+@c found.  They are also used to create the vmips(1) man page.
+@include invoke.texi
+
+@c This file is where the Invoking vmipstool node is to be
+@c found.  It is also used to create the vmipstool(1) man page.
+@include vmipstool.texi
+
+@node Programming, Debugging, Invoking vmipstool, Top
+@chapter Programming
+
+In this section we attempt to give some hints about writing code for
+VMIPS.  They are primarily intended for assembly language programmers,
+but should be helpful to anyone interested in the MIPS
+architecture. This section will not replace a good MIPS reference; check
+the ``References'' section for more information about these. However, any
+help is appreciated for making this section more complete.
+
+@section Delay slot handling
+
+MIPS branch instructions' effects are delayed by one instruction;
+the instruction following the branch instruction is always executed,
+regardless of whether the branch is taken. This is a consequence of
+the pipeline which is not important to virtual machine architecture,
+except that it has to be emulated correctly.
+
+VMIPS emulates delay slot handling by means of a tiny state machine, whose
+state is called the delay state.  The virtual CPU can be in a delay state
+of @code{DELAYING}, @code{DELAYSLOT}, or @code{NORMAL} at the beginning
+of the call to @code{step()}. The VMIPS delay slot state machine's state
+is displayed when you use the @option{dumpcpu} option. See the ``Summary
+of configuration options'' section of the ``Customizing'' chapter for more
+information about this option.
+
+A delay state of @code{NORMAL} corresponds to execution in the non-branch case.
+
+A delay state of @code{DELAYING} means that the instruction being executed
+caused a branch to be taken, and the next instruction to execute is in
+the delay slot. 
+
+A delay state of @code{DELAYSLOT} means that the instruction just executed
+was in the delay slot, and the next instruction to execute is the
+branch target.  If there is an exception, the exception PC will be the
+PC of the branch instruction, not of this one.
+
+@node Debugging, Interaction, Programming, Top
+@chapter Debugging
+
+@cindex debugging
+VMIPS supports debugging programs running on the virtual machine by
+providing an interface to GDB, the GNU debugger.  GDB talks to VMIPS using
+its built-in remote serial protocol, over a local TCP connection.  See the
+``Remote Serial'' section of the GDB manual for details of the protocol.
+
+You must use a MIPS-targetted GDB to debug programs running on VMIPS;
+that is, you must use a copy of GDB that understands MIPS assembly
+language and registers.  Usually, a copy of GDB configured this way will
+have a name starting with @file{mips}, e.g., @file{mipsel-ecoff-gdb}.
+See the ``Installation'' section of the manual for more information on
+configuring and building a MIPS-targetted GDB.
+
+If you want to use the VMIPS GDB interface, set the @samp{debug}
+flag on the command line. VMIPS will wait for you to attach GDB and type
+@samp{continue} at the GDB prompt before booting the ROM file.
+
+To attach GDB to VMIPS, look for the line in the VMIPS startup message that
+reads:
+
+@example
+Use this command to attach debugger: target remote 127.0.0.1:3371
+@end example
+
+Make a note of the @command{target remote} command VMIPS printed out.
+The host and port numbers (@samp{127.0.0.1:3371}) are likely to be
+different on your machine than are shown here. If you want to force
+a particular port to be used, specify the @option{-o debugport=PORT}
+option when starting VMIPS.
+
+When VMIPS pauses and says @samp{Waiting for connection from debugger},
+open up GDB in another window or on another terminal on the program you
+are debugging. Do not try to open GDB on the ROM file, because GDB doesn't
+understand ROM files. Instead, give GDB the name of the executable you
+used as input when creating the ROM file. For best results, it should have been
+compiled with @option{-g}, so that it will contain extra debug information,
+and should not have had @command{strip} run on it.
+
+Once GDB is open, type in to GDB the @command{target remote} command that
+VMIPS printed out. GDB will connect to VMIPS, which will be stopped at
+the first instruction of your setup code. Then you can set breakpoints,
+single step, or just let the program continue. VMIPS will return control
+to GDB on exceptions.
+
+If you change your mind while VMIPS is waiting for a debug connection,
+type Control-C to VMIPS to cancel.
+
+Here is what the whole setup process looks like in VMIPS:
+
+@iftex
+@c A lot of these examples are too wide for regular @example.
+@c This block is a dumb hack to make *this particular* @example use the regular
+@c margins. See the definition of @cartouche to see how it works.
+@begingroup
+@let@nonarrowing=@comment
+@end iftex
+
+@example
+% ./vmips -o debug boot.rom
+Auto-size ROM image: 4096 words.
+Running self tests.
+Little-Endian host processor detected.
+Self tests passed.
+Use this command to attach debugger: target remote 127.0.0.1:33891
+Mapping ROM image (boot.rom): 4096 words at 0xbfc00000 [1fc00000]
+Attached SerialHost(fd 5) at 0x808cab8 to SPIMConsole [host=0x808cac8]
+Attached SPIMConsole [host=0x808cac8] to phys addr 0x2000000
+Connecting IRQ2-IRQ6 to console.
+Mapped (host=0x401a4008) 1024k RAM at base phys addr 0
+
+*************RESET*************
+
+Waiting for connection from debugger.
+@end example
+
+@iftex
+@endgroup
+@end iftex
+
+Here is what the whole setup process looks like in GDB:
+
+@iftex
+@c A lot of these examples are too wide for regular @example.
+@c This block is a dumb hack to make *this particular* @example use the regular
+@c margins. See the definition of @cartouche to see how it works.
+@begingroup
+@let@nonarrowing=@comment
+@end iftex
+
+@example
+@iftex
+@hfuzz=1000pt
+@end iftex
+% mips-dec-ultrix4.5-gdb boot.exe
+GNU gdb 4.17
+Copyright 1998 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "--host=i586-pc-linux-gnu --target=mips-dec-ultrix4.5"...
+(gdb) target remote 127.0.0.1:33891
+Remote debugging using 127.0.0.1:33891
+__start () at setup.S:24
+24              move $1, $0
+Current language:  auto; currently asm
+@end example
+
+@iftex
+@endgroup
+@end iftex
+
+@section GDB, VMIPS and Signals
+
+Since VMIPS does not know what operating system you are running on it, and GDB
+does not believe in hardware exceptions (only operating system signals), VMIPS
+has its own mapping of hardware exceptions to signals.
+
+The mapping is as follows: Each signal is followed by a list of the hardware
+exceptions that map to it.
+
+@table @var
+@item SIGINT
+@itemize
+@item Interrupt
+@end itemize
+
+@item SIGSEGV
+@itemize
+@item TLB modification exception
+@item TLB exception (load or instruction fetch)
+@item TLB exception (store)
+@item Address error exception (load or instruction fetch)
+@item Address error exception (store)
+@end itemize
+
+@item SIGBUS
+@itemize
+@item Instruction bus error
+@item Data (load or store) bus error
+@end itemize
+
+@item SIGTRAP
+@itemize
+@item SYSCALL exception
+@item Breakpoint exception (BREAK instruction)
+@item Processor reset (only at VMIPS startup)
+@end itemize
+
+@item SIGILL
+@itemize
+@item Reserved instruction exception
+@end itemize
+
+@item SIGFPE
+@itemize
+@item Coprocessor Unusable
+@item Arithmetic Overflow
+@end itemize
+
+@item SIGHUP
+@itemize
+@item (Anything else.)
+@end itemize
+@end table
+
+@subsection Startup behavior
+
+Upon connecting to the VMIPS socket, gdb asks for the number of the
+signal that stopped VMIPS. Of course, there was no exception, since no
+instructions have executed, but we have to give a reason anyway. The
+signal that is always returned is the signal corresponding to the
+breakpoint exception -- hence the listing for processor reset in the
+signal table above, even though reset is not really an ordinary exception.
+
+@section ROM Breakpoints
+
+@cindex ROM, breakpoints in
+VMIPS supports the setting of breakpoints in ROM.  This would not be
+extraordinary except that MIPS breakpoints are usually implemented by
+GDB's remote serial protocol by overwriting instructions with MIPS @code{break}
+instructions. VMIPS keeps a single bit for each word of ROM, in order
+to tell whether that instruction is really a breakpoint. GDB keeps track
+of setting and unsetting the breakpoints.
+
+@section Limitations
+
+@cindex debugging, limitations of
+
+@subsection Detaching Limitations
+
+When the debugger disconnects or detaches from VMIPS, the system will halt
+and VMIPS will exit.
+
+@subsection Protocol Limitations
+
+The GDB remote serial protocol supports lots of packets, but VMIPS does
+not support all of them.  The following subset of the GDB remote serial
+protocol is implemented.
+
+@itemize
+@item packet 'g': Read registers
+@item packet 'G': Write registers
+@item packet 'm': Read memory
+@item packet 'M': Write memory
+@item packet 'c': Continue
+@item packet 'D': Detach
+@item packet 's': Single step
+@item packet 'k': Kill target
+@item packet 'H': Set thread
+@item packet 'T': Poll thread
+@item packet '?': What was the last signal?
+@item packet 'Z': Set breakpoint
+@item packet 'z': Remove breakpoint
+@item packet 'q': Query
+@end itemize
+
+For some of these packets, not all the arguments are supported.
+For example, in general, VMIPS acts as if it has exactly one thread.
+
+@section Using Insight as a GUI for VMIPS
+
+@cindex Insight
+@cindex GUI, using Insight
+You can use the Insight graphical front end for GDB as a graphical front end
+for VMIPS. 
+
+As with GDB, you must use a MIPS-targetted Insight to debug programs
+running on VMIPS; that is, you must use a copy of Insight that
+understands MIPS assembly language and registers.  Usually, a copy of
+Insight configured this way will have a name starting with @file{mips},
+e.g., @file{mipsel-ecoff-gdb}. (Confusingly, Insight binaries are also
+named @file{gdb}.)
+
+Now let's walk through an example scenario where we want to
+use Insight to debug a program running in ROM on VMIPS.
+
+1. Start VMIPS using the @option{-o debug} command line flag, to activate the
+debugging interface, and specify the name of the ROM file containing the ROM
+you want to debug.
+
+2. Start Insight. 
+
+3. Choose Open... from the File menu. Select the executable file corresponding
+to the ROM file you just loaded in to VMIPS.
+
+4. VMIPS will have printed out a message like:
+@example
+Use this command to attach debugger: target remote 127.0.0.1:3082
+@end example
+
+To tell Insight what to do, choose Target Settings... from the File menu.
+In the Connection panel, set the Target to Remote/TCP, and set the Hostname to
+127.0.0.1, and set the Port to 3082. Then hit OK.
+
+5.  Now, choose Connect to target from the Run menu. This will probably
+bring up a dialog box affirming that the connection was successful.
+Now you can look at registers, step through code, and whatnot, till your
+heart's content.
+
+@node Interaction, Devices, Debugging, Top
+@chapter Interaction
+
+The interactive inspector (also known as the interactor) provides
+a way to inspect a running vmips system without attaching a debugger.
+
+You can enter the interactive inspector at any time while the 
+simulation is running.
+To enter the interactive inspector, hit Control-underscore (^_) which enters
+an ASCII 0x1F (US) byte at the terminal. This will cause the
+simulation to pause and the "vmips=>" interactor prompt to be
+printed.
+
+The interactor will loop prompting you for commands and processing
+them until you enter a command that exits the interactor.
+
+@section Command table
+
+@table @samp
+@item go
+Continue execution and exit the interactive inspector.
+You can reenter the interactive inspector again later by hitting
+Control-underscore again.
+
+@item step
+Attempt to step one instruction.
+After a single-step attempt, the PC will be printed.
+
+@item halt
+Halt machine, exit the interactive inspector, and quit VMIPS.
+
+@item quit
+Same as halt.
+
+@item regs
+Print the CPU registers.
+
+@item cp0
+Print the CP0 registers and TLB.
+
+@item mem A
+Print the first few words of memory starting from address A.  The address
+provided must be a 32-bit, word-aligned address.
+
+@item dis A
+Disassemble the first few words of memory at address A.  The address
+provided must be a 32-bit, word-aligned address.  Due to a limitation
+in the current implementation, disassembly will invariably be printed
+to standard error.
+
+@item stack
+Print the first few words of memory starting from the stack pointer.
+
+@item help
+Print a list of available commands.
+@end table
+
+@node Devices, Monitor, Interaction, Top
+@chapter Devices
+
+VMIPS comes with a few standard devices.
+
+@section SPIM-compatible console device
+
+The SPIM-compatible Console Device models a serial controller with
+two 200-baud full-duplex communication lines and a 1 Hz clock providing
+timer interrupts. This console device is currently the standard console
+device used in VMIPS.
+
+@subsection Memory-mapped registers
+
+The SPIM-compatible console device communicates with the CPU by means
+of a series of 9 32-bit-wide control and data registers, for a total
+of 36 memory-mapped bytes. The control registers are used for enabling
+and disabling specific devices' interrupt request mechanisms, and for
+determining which device(s) is/are ready for data when polling or during
+interrupt processing.
+
+The following table details the offset of each register within the
+console device's mapped memory:
+
+@multitable @columnfractions 0.20 0.40
+@item offset 0x00 @tab Keyboard 1 Control
+@item offset 0x04 @tab Keyboard 1 Data
+@item offset 0x08 @tab Display 1 Control
+@item offset 0x0c @tab Display 1 Data
+@item offset 0x10 @tab Keyboard 2 Control
+@item offset 0x14 @tab Keyboard 2 Data
+@item offset 0x18 @tab Display 2 Control
+@item offset 0x1c @tab Display 2 Data
+@item offset 0x20 @tab Clock Control 
+@end multitable
+
+Within each control register, Bit 2 of each word is the Device
+Interrupt Enable bit, and bit 1 is the Device Ready bit.  Only the
+Device Interrupt Enable bits of the control registers are writable;
+other bits must be written as zero. Only Device Interrupt Enable and
+Device Ready are readable; other bits read as zero. Initially the 
+Interrupt Enable bits on all SPIM console control words are unset.
+
+Within each data register, writes are allowed only to the
+least-significant 8 bits; the other 24 bits read as zero and must be
+written as zero.
+
+@subsection Interrupts
+
+With a SPIM-compatible Console Device configured, the following interrupt
+lines are enabled.
+
+@display
+Interrupt line 2 (Cause bit 0x0400) is wired to the Clock
+Interrupt line 3 (Cause bit 0x0800) is wired to the #1 Keyboard
+Interrupt line 4 (Cause bit 0x1000) is wired to the #1 Display
+Interrupt line 5 (Cause bit 0x2000) is wired to the #2 Keyboard
+Interrupt line 6 (Cause bit 0x4000) is wired to the #2 Display
+@end display
+
+When any one of the console devices is both ready and has its Device
+Interrupt Enable bit set, it requests an interrupt.  (You must have the
+interrupt mask and interrupt enable bits of the CP0 Status register set
+for this request to succeed.) It follows that if the device becomes ready
+and then the user sets the Device Interrupt Enable bit, the device will
+immediately attempt to request an interrupt.  You can determine which
+device requested the interrupt by examining the Interrupt Pending field
+of the CP0 Cause register in your interrupt handler code.
+
+@subsection Display
+
+The display data register is write-only.
+On a write to the data register, the display becomes unready and writes
+a char to the connected serial interface; it becomes ready again in 40
+ms.
+
+@subsection Clock
+
+The Clock has no data register and becomes ready at most every second. A
+read from the Clock Control register makes the clock unready. Writes to
+the clock control register are as above.
+
+@subsection Keyboard
+
+The keyboard is initially unready; whenever the connected serial
+interface has a byte waiting on input, and the keyboard is unready,
+the keyboard reads the byte into its buffer, and becomes ready. If the
+keyboard is ready for more than 40 ms., it will check the connected
+serial interface again.  If there is another byte available, it will
+read it and save it in the buffer, writing over the one which was
+originally in the buffer. No provision is made for detection of these
+buffer overruns.  Updates to the keyboard buffer happen at most once
+per instruction fetched.
+
+The keyboard data register is read-only.  On a read from the data
+register, if the keyboard is ready it becomes unready and returns the
+byte in its holding buffer. If the keyboard data register is read while
+the keyboard is unready, the data in the buffer is the same as when
+the keyboard was last ready.
+
+@subsection Compatibility
+
+The SPIM-compatible console device is based on the SPIMSAL 4.4.2 version,
+which generally provides a superset of the functionality of the console
+device provided in SPIM 5.x and 6.x.
+
+In SPIM 5.x/6.x, the keyboard controller appears at virtual address
+0xffff0000. Keyboard 2, Display 2 and the Clock device are not available.
+(This is the same layout used in Patterson and Hennessy's Computer
+Organization and Design textbook.)  Therefore, in order to get compatible
+behavior from the VMIPS SPIM-compatible console device, your startup
+code should configure the TLB to map virtual page number 0xffff0 to the
+physical addresses where the SPIM-compatible console device is configured.
+
+In SPIM, when you read or write to a memory-mapped I/O register, only the
+virtual address and the data value stored are considered, not the width
+of the access.  This means that on a big-endian machine, you can (for
+example) write the display at the most-significant byte of the display
+data word (using a store byte instruction), or at the least-significant
+byte of the word (using a store word instruction). In VMIPS, you must
+always write the least-significant byte.
+
+In SPIMSAL, it is believed to be the case that reads always read from
+keyboard 1, never from keyboard 2; whereas the user may write to either
+display, but data written to either display are invariably written to
+the simulator's standard output. Compatibility with these bugs is not
+supported.
+
+@subsection Disconnected operation
+
+The SPIM console device can be configured to turn off either the first or
+the second display/keyboard pair. Use the special keyword @option{off} in
+place of a device name, e.g., @samp{-o ttydev=off}, to turn off a console
+line. When a console line is turned off, it is described as `disconnected',
+and behaves as follows:
+
+@itemize
+@item Interrupts can be turned on and off as usual. 
+@item A disconnected keyboard always has Device Ready clear and always
+returns ASCII NULs (zero bytes) when its data word is read.
+@item A disconnected display discards bytes written to it, and always
+has Device Ready set, but if its interrupts are turned on, it will not
+generate an interrupt.
+@end itemize
+
+@section Standard clock device
+
+This section documents the standard clock device for VMIPS. It is intended
+to support user programs' access to real and simulated time.  The clock
+device supports a hardware clock interrupt to notify MIPS programs of the
+passage of a prespecified number of nanoseconds, determined by the user's
+setting of the @option{clockintr} option. This clock provides a much
+higher resolution than the SPIM-compatible console device's 1Hz clock.
+The clock is enabled or disabled with the @option{clockdevice} option.
+
+@subsection Memory-mapped registers
+
+The standard clock device has 5 registers, configured to be mapped
+into memory at physical address 0x01010000. The following table
+defines the layout of the memory-mapped clock device registers:
+
+@table @code
+@item offset 0x00
+real time, seconds
+
+@item offset 0x04
+real time, microseconds
+
+@item offset 0x08
+simulated time, seconds
+
+@item offset 0x0c
+simulated time, microseconds
+
+@item offset 0x10
+control word
+@end table
+
+Writing any of the clock's real time words is undefined. Writing a clock's
+simulated time word sets that component of the simulated time if the number
+written is a non-negative signed integer, otherwise there is no effect.
+
+The control word has 32 bits. Bit 2 of the control word is the interrupt
+enable bit (@code{CTL_IE} is defined as 0x00000002) and bit 1 is the device
+ready bit (@code{CTL_RDY} is defined as 0x00000001). All other bits in the
+control word are currently reserved and read as zero. Writing any of the
+other bits of the control word is undefined. The interrupt enable bit
+in the clock device control word is initially unset.
+
+@subsection Interrupts
+
+The standard clock device is connected to the hardware interrupt
+line specified by the @option{clockdeviceirq} option, which must be a
+number corresponding to an interrupt line reserved for use by hardware
+(2 through 7). See the ``Summary of configuration options'' section of
+the ``Customizing'' chapter for more information.  The clock requests an
+interrupt whenever the clock is in the ready state and the interrupt
+enable bit on the control word is set.
+
+The @option{clockintr} option gives the frequency of clock interrupts in
+nanoseconds of simulated time. See the ``Summary of configuration options''
+section of the ``Customizing'' chapter for more information.
+
+@subsection Real vs. simulated time
+
+Real time is obtained from the host's @code{gettimeofday(2)} system
+call, so it should be close to the host's view of the current time. No
+sophisticated algorithms are used to calibrate the real time clock, so
+it will drift a little.
+
+The speed of simulated time is determined by the @option{realtime},
+@option{timeratio}, and @option{clockintr} options. See the ``Summary
+of configuration options'' section of the ``Customizing'' chapter for more
+information. Increasing the speed of simulated time will most likely
+make the simulation run more slowly because it will increase the average
+number of system calls per instruction.
+
+@section Halt device
+
+This section documents the halt device. It is provided so that simulated
+operating systems can stop the simulator in a controlled manner, without
+having to rely on specific instructions or exceptional conditions. The
+halt device is enabled or disabled with the @option{haltdevice} option.
+
+@subsection Memory-mapped registers
+
+The halt device has 1 register, configured to be mapped into memory at
+physical address 0x01010024. The following table defines the layout of the
+memory-mapped halt device register:
+
+@table @code
+@item offset 0x00
+control word
+
+@end table
+
+Writing a non-zero value to the halt device control word halts the
+simulation. Writing zero has no effect. The control word is always read
+as zero.
+
+@section DECstation 5000/200-compatible devices
+
+VMIPS contains partial support for the built-in memory-mapped devices on the
+motherboard of the Digital Equipment DECstation 5000/200.  This support should
+be considered "beta" quality in this release.   All the DECstation-compatible
+devices are disabled by default; see the options starting with @option{dec} in
+the Customizing chapter for information about how to turn them on.
+
+The following devices are supported:
+
+@itemize
+@item DECstation 5000/200's Dallas Semiconductor DS1287-based real-time
+clock (RTC) chip (use @option{-o decrtc} to enable; mapped into memory
+at physical address 0x1fe80000)
+
+@item DECstation 5000/200's Control/Status register (use @option{-o
+deccsr} to enable; mapped into memory at physical address 0x1ff00000)
+
+@item DECstation 5000/200's Check Syndrome (CHKSYN) and Error Address
+(ERRADR) registers (use @option{-o decstat} to enable; mapped into memory
+at physical addresses 0x1fd00000 and 0x1fd80000 respectively)
+
+@item DECstation 5000/200's DZ11-based serial chip (use @option{-o
+decserial} to enable; mapped into memory at physical address 0x1fe00000; note:
+interrupt-driven I/O does not work well with this device -- use polling
+instead)
+@end itemize
+
+In the future, we plan to finish these device emulations, test them more
+thoroughly, and document them more completely in this manual.
+
+The devices are documented thoroughly in the document: "DECstation 5000/200
+KN02 System Module Functional Specification", published August 1990 by Digital
+Equipment Corporation. You may be able to find it by doing a web search.
+
+@node Monitor, Extending, Devices, Top
+@chapter Monitor
+
+@cindex bootstrap monitor
+@cindex bootstrap loader
+@cindex ROM bootstrap loader
+@cindex ROM monitor
+
+The main use of the ROM monitor is to load executables into RAM
+and run them.  Currently, only COFF executables are supported.
+
+@section Monitor Commands
+
+The ROM monitor is structured around a simple command processor
+that prompts the user to enter a command, reads a command from
+the first serial line, and executes it. This loop continues until you
+boot a kernel (which may or may not ever return control to the monitor)
+or halt the system.
+
+The following are commands supported by the ROM monitor.
+The first word is the command name; other words are arguments that you
+specify.  Arguments in brackets are optional.
+
+@table @code
+@item rx
+Receive file via XModem protocol over serial device into RAM.
+
+@item quit
+Halt the boot monitor.
+
+@item help
+Print a brief list of commands.
+
+@item peek addr nwords
+Read and print 32-bit value at address addr.
+
+@item poke addr value
+Write the given 32-bit value to address addr.
+
+@item info
+Print information about a COFF program which was previously loaded.
+
+@item boot [args]
+Run a program which has previously been loaded by calling its entrypoint.
+
+@item rom addr nwords
+Prepare to boot a file from ROM address addr, having length nwords (rather than
+RAM).
+
+@item printenv
+Print the boot environment.
+
+@item setenv varname value
+Set the boot environment variable named varname to value.
+
+@item unsetenv varname
+Delete the boot environment variable named varname.
+
+@item call addr [args]
+Call procedure at addr.
+
+@end table
+
+@section Loading Your Program
+
+The main facility provided for transferring a file to the boot monitor is
+the XModem serial file transfer protocol.  On the host side, you can use
+a program such as @command{sx} to send files via XModem.
+
+COFF executable files are loaded to @code{BASE_ADDR} (0x80000000 by default),
+and then moved to their proper location at boot time.
+
+Instead of transferring a file to the boot monitor, you can put the file
+into a separate area of ROM and load it using the @command{rom} command.
+
+Yet another alternative is to use the @command{catrom} script, which will
+build you a ROM image containing the boot monitor and a COFF executable
+of your choice, and patch the boot monitor to load it automatically.
+A boot monitor thus patched will not require user interaction and is very
+often the quickest way to test out a new program. A dummy @code{argv[0]}
+will always be passed to the booted program in this mode.
+
+@section Booting Your Loaded Program
+
+For the boot and call commands, the code being called is assumed to have
+the same prototype as main. Providing arguments is optional.  Any arguments
+provided are passed to the procedure in argc/argv form. It is a good idea
+always to pass at least one argument (@code{argv[0]}) to the booted program.
+
+The boot-time exception vectors (BEV bit in CP0 Status register) will
+typically be disabled upon booting a program and reenabled if that program
+returns control to the monitor.
+
+@section Other Monitor Facilities
+
+The boot monitor contains a set of basic library routines and a
+jump table that mimics to some extent the one found in the DECstation
+ROM.
+
+Exceptions caught in the boot monitor will generally cause the
+monitor to print a message and halt.
+
+@section Hacking the Monitor
+
+Whether to use the SPIM-compatible console device or the DECstation-compatible
+serial device is determined at the time you build the boot monitor. Either
+the @code{SPIM_CONSOLE} or the @code{DZ_CONSOLE} macro at the top of
+@file{serial.c} must be set to 1.
+
+The monitor directory contains a @file{README} file with more information
+about the structure of the code.
+
+If you are trying to get standalone programs working before you have a
+working C library or proper serial drivers, you may get some mileage out
+of the standalone library (@file{lib.c} and @file{lib.h}) routines used by
+the boot monitor.
+
+The boot monitor directory also contains some tests, and an example
+(@file{loadtest.c}) program that you may be able to compile and boot via
+the monitor.  Of course, the monitor code is under the same license as VMIPS.
+
+@node Extending, Test Suite, Monitor, Top
+@chapter Extending
+
+This chapter is intended to be a hacker's guide to adding or modifying
+VMIPS functionality.
+
+@section Road map to the VMIPS source code
+
+This section is intended to help interested persons find various things
+in the VMIPS source code, and get a general idea of how the various
+software modules are structured.
+
+The processing of command-line options and of options in your
+@file{.vmipsrc} is directed by routines in @file{options.cc} and in class
+@code{Options}. The default options and the option documentation are found
+in @file{optiontbl.h}.
+
+The memory mapping unit has a high-level interface to the rest of
+the code, which is defined in @file{mapper.cc} and @file{mapper.h},
+and in class @code{Mapper}.  The memory mapping unit uses a bunch of
+low-level data structures, which are defined in @file{range.cc} and
+@file{range.h}, in class @code{Range}. This is
+meant to be logically and physically separate from the TLB, which is
+implemented as part of the system control coprocessor.  The actual chunks
+of host virtual memory which are used for the virtual machine's physical
+memory are encapsulated in class @code{MemoryModule}, which is implemented in
+@file{memorymodule.h}.
+
+The memory mapping unit is responsible for handling memory accesses
+via the cache, or without using the cache, as appropriate. The cache
+is defined in class @code{Cache}, also in @file{mapper.cc} and
+@file{mapper.h}. Two instances of this class exist as the @code{icache}
+and @code{dcache} members of class @code{Mapper}.
+
+The system control coprocessor (MIPS coprocessor zero) and the
+TLB are implemented in @file{cpzero.cc} and @file{cpzero.h}, as
+class @code{CPZero}. The structure of TLB entries is defined in
+@file{tlbentry.h}, and constants related to the
+register set of MIPS coprocessor zero are defined in @file{cpzeroreg.h}.
+
+The CPU (class @code{CPU}) and the default exception handling behavior are
+implemented in @file{cpu.cc} and @file{cpu.h}. Exception handling behavior
+is an interface described by class DeviceExc (in @file{deviceexc.h});
+this class provides for the @code{exception} instance method and its
+implementations in class @code{CPU} and class @code{Debug}.
+Constants for the different kinds of exceptions which are implemented
+by MIPS processors are defined in @file{excnames.h}.
+
+The disassembler uses code from GNU libopcodes (part of GNU
+Binutils); it is located in the @file{libopcodes_mips} directory.
+The high-level C++ interface to the disassembler is in @file{stub-dis.cc}.
+
+The GNU debugger interface is separated into a high-level part (which
+deals with the various debugger requests) in @file{debug.cc} and
+@file{debug.h}, and a low-level part (which assembles and disassembles
+the GDB remote serial protocol packets), in @file{remotegdb.cc} and
+@file{remotegdb.h}.
+
+A few parts of the VMIPS system have a central procedure which needs
+to be run periodically in a loop in order to update the part of the
+simulation that they are responsible for.  These parts typically have
+instance methods named @code{step()}. The @code{CPU} class, for example,
+fetches, decodes, and executes one instruction each time its @code{step()}
+function is called.
+
+The @code{vmips} class, implemented in @file{vmips.cc}, is used to tie
+all the components of the system together.  This class, and specifically
+its @code{run()} member function, is responsible for setting up
+and configuring all system components and calling the @code{step()}
+member function(s).  The vmips class is not a very smart or
+flexible configuration mechanism; it eventually ought to be replaced with
+a configuration language of some sort.
+
+The simulator's idea of time is managed by classes in @file{clock.cc} and
+@file{clock.h}. VMIPS programs gain access to the simulated clock by using
+the memory-mapped clock device, which is implemented in files
+@file{clockdev.cc} and @file{clockdev.h}, and whose register map is available
+in @file{clockreg.h}. The clock manages tasks, which are basically function
+objects that can be cancelled or fire at a later time. Tasks are defined in
+@file{task.h}. 
+
+VMIPS provides standard error-reporting functions, which your code can use.
+They are defined in @file{error.cc} and @file{error.h}.
+
+Some of VMIPS's simulated devices share common semantics for control
+register bits, constants for which are defined in @file{devreg.h}.
+
+VMIPS provides a halt device, which can halt the machine even when the
+options such as @file{haltbreak} are turned off.  It is implemented in
+@file{haltdev.cc} and @file{haltdev.h}, and its register map is defined
+in @file{haltreg.h}.
+
+The SPIM-compatible console device (implemented in @file{spimconsole.cc}
+and @file{spimconsole.h}, with a register map in @file{spimconsreg.h})
+is based on a generic terminal controller, which is implemented in
+@file{terminalcontroller.cc} and @file{terminalcontroller.h}.
+
+The various DECstation-compatible devices are implemented in the files whose
+names start with @file{dec}.
+
+@cindex ROM monitor
+The ROM monitor code is in the directory @file{sample_code/xmboot}.
+See the Monitor chapter for more details.
+
+The manual, and any random bits of hacking information which have not
+yet been incorporated into the manual, are in the directory @file{doc}.
+
+The VMIPS automated regression test suite is in the directory
+@file{test_code}. Some interesting sample code, including the canned ROM
+setup code used to build ROM files out of C programs for the test suite,
+is in the directory @file{sample_code}.
+
+Various scripts used by the maintainers to help maintain the code are
+in the directory @file{utils}.
+
+VMIPS provides a simple front-end to GNU MIPS cross-compilation tools,
+called Vmipstool. Its implementation is in the file @file{vmipstool.cc};
+it shares a little bit of options- and error-handling code with VMIPS.
+
+Interfaces to the host system's C++ standard library are included in
+@file{sysinclude.h}. @file{wipe.h} is a template utility function used
+for deleting all the objects contained in standard C++ containers.
+
+Please read the rest of this chapter for information about the rest
+of the files in the VMIPS source directory.
+
+@section Endianness issues
+
+When you are making extensions to VMIPS, it is important not to assume that
+your host processor is little-endian (or to assume that it is big-endian). One
+of the first things that VMIPS does when it starts is to determine the
+endianness of the host processor. The endianness of the VMIPS target processor
+is determined by the @option{bigendian} command-line option. Your extension
+can query the @code{machine->host_bigendian} flag to determine whether the
+host processor is big-endian or not, and it can query the @option{bigendian}
+command-line option, via the public interface of class @code{Options},
+to determine whether the VMIPS target processor is big-endian or not.
+
+The physical memory system (class @code{Mapper}) defines some convenience
+methods which you can use. You can call the @code{swap_word()} or
+@code{swap_halfword()} methods of class @code{Mapper}, or the wrapper functions
+@code{host_to_mips_word()} and @code{mips_to_host_word()}, to do endianness
+translation between the host machine and target machine, when necessary.
+
+When you define memory-mapped devices, you should return data to
+the Mapper in host endianness. It is recommended that memory-mapped devices
+also store their data in host endianness, unless there is a good reason.
+
+@section Memory-Mapped Devices
+
+Memory-mapped devices must inherit from class @code{DeviceMap}, which
+is defined in the files @file{devicemap.cc} and @file{devicemap.h}
+in the VMIPS source directory.
+
+Memory-mapped devices must have a constructor and a destructor. The
+constructor must call the DeviceMap constructor with a single parameter,
+called @var{extent}. It should be equal to the number of
+bytes which are mapped into the processor's memory; this figure must be
+a multiple of 4. The device must also override the following abstract
+methods:
+
+@example
+uint32 fetch_word(uint32 offset, int mode, DeviceExc *client);
+uint32 store_word(uint32 offset, uint32 data, DeviceExc *client);
+@end example
+
+The meanings of the parameters are as follows:
+
+@table @var
+@item offset
+Byte offset from the beginning of the device's memory-mapped region that is
+being read or written. The width of the read (fetch) or write (store)
+is either a word (4 bytes), halfword (2 bytes), or a single byte,
+depending on the call. Since this value is a byte offset, if you want to
+figure out which word of your device is being accessed, you should
+divide it by 4.
+
+@item mode
+This tells you whether the memory access is a data load
+(@code{DATALOAD}), data store (@code{DATASTORE}), or instruction
+fetch (@code{INSTFETCH}). These constants are defined in
+@file{accesstypes.h}. For narrow (< 1 word) fetches, the mode is always
+@code{DATALOAD}. For stores, the mode is always @code{DATASTORE}.
+The only case in which this is ambiguous is for the @code{fetch_word}
+case, where mode may be either @code{DATALOAD} or @code{INSTFETCH}.
+Most devices do not need to bother with the mode, except when there is an
+illegal access. See the section on exception behavior, below.
+
+@item client
+Every memory access is requested by a client, which is responsible for
+handling any exceptions which may arise. Any component of the VMIPS
+system which may access memory must either inherit from class @code{DeviceExc}
+(i.e., ``a device which may handle exceptions''), or have a pointer to a device
+which does. See the section on exception behavior, below.
+
+@item data
+When the client is storing a value, you will receive the value as the
+@var{data} parameter.
+@end table
+
+@section Exception behavior
+
+Whenever there is an exception,
+the device must make the call
+@example
+client->exception(type, mode);
+@end example
+whose precise prototype is defined in @file{deviceexc.h}.
+
+@var{Type} must be one of the standard MIPS exception codes, which are
+defined in @file{cpzeroreg.h}, and elsewhere in this manual. @var{Mode}
+is the mode of the memory access; see the table entry for @var{mode}
+above.
+
+Please note that you should not call the @code{exception} method in
+order to generate a hardware interrupt (i.e., the Interrupt exception).
+Interrupts are managed by class @code{IntCtrl}, and your device should
+call the @code{assertInt} function to generate them.  See the
+``Interrupt-generating devices'' section for more details on what you
+should do. If you are curious about the inner workings of the interrupt
+controller, you can read its source in @file{intctrl.cc} and @file{intctrl.h}.
+
+@subsection Coprocessors
+
+If your device is part of a MIPS coprocessor, you should pass a third
+argument to the @code{client->exception()} call, which is the number of
+the coprocessor; it may meaningfully be 0, 1, 2, or 3. Ordinarily, that
+is to say in situations not involving coprocessors, this parameter
+defaults to -1 and does not need to be specified explicitly.
+
+@cindex coprocessor zero
+Coprocessor 0 is the MIPS system control coprocessor, responsible for
+TLB and paging management. It is implemented as class @code{CPZero} in
+@file{cpzero.cc} and @file{cpzero.h}. It has 16 registers, each of which
+has some read-only bits and some read/write bits. Extension code should
+not attempt to misrepresent itself as being coprocessor zero without a
+good reason.
+
+@cindex registers, read-only
+One of the jobs of the @code{CPZero} class is to ensure that attempts to
+write to these registers are only allowed to write to the bits which
+are writable, so if you are interested in implementing read-only and
+read/write registers in your virtual hardware, look through @file{cpzero.cc}
+for @var{read_masks} and @var{write_masks}.
+
+@cindex coprocessors, floating-point
+Coprocessor 1 is the floating point coprocessor, but it is not
+implemented. It may, however, be implemented in the future. Volunteers
+to begin such a task would be more than welcome.
+
+@cindex coprocessors, default behavior
+The default behavior of MIPS coprocessors 1, 2, and 3 in the VMIPS system
+is to assume that they are not connected to the system and that accesses
+to them should therefore trigger the @code{CpU} (Coprocessor Unusable)
+exception.
+
+@section Mapping memory-mapped devices
+
+You can map each memory-mapped device at a single physical address in the
+machine's memory.  The instantiation process is as follows: Assume
+that @code{TestDev} is a memory-mapped device class which derives from
+class @code{DeviceMap}, that @var{testdev} is an instance of class
+@code{TestDev}, and that @var{physmem} is a @code{Mapper} (memory
+manager) object.
+ 
+@example
+ 	/* Test device at base phys addr 0x01000000 */
+ 	testdev = new TestDev();
+ 	physmem->add_device_mapping(testdev, 0x01000000);
+@end example
+
+@cindex memory-mapped devices, configuring
+@cindex memory-mapped devices, specifying addresses for
+A device should have a single base address;
+you should have a single call to the Mapper instance
+method @code{add_device_mapping(device, addr)} to set it.
+@var{device} is an instance of a class deriving from class
+@code{DeviceMap}. @var{addr} is the physical address where you want the
+device to appear in memory.
+
+This code is generally executed as part of the @code{vmips->run()}
+method in @file{vmips.cc}. Look there for more information and some
+examples of what to do.
+
+@section Interrupt-generating devices
+
+@cindex interrupts
+VMIPS provides support for virtual devices that generate hardware
+interrupts to communicate with the processor. These virtual devices should
+inherit from class @code{DeviceInt} (defined in @file{deviceint.h}). This
+section outlines some information about how to write such virtual devices.
+
+@subsection Connecting devices to the interrupt controller
+
+@cindex interrupts, request lines for
+There are 8 interrupt lines in the R3000/R3000A, 6 of which (7..2) are
+hardware interrupts (readable by software), and the other 2 of which
+(1..0) are software interrupts (readable/writable by software).
+
+The class @code{IntCtrl} instance method @code{connectLine(irq,
+device)} is used in @file{vmips.cc} to notify the interrupt
+controller and the device that the interrupt line specified by @var{irq}
+is connected to @var{device}.  @var{irq} must be one of the hardware
+interrupt constants defined in @file{deviceint.h} and @var{device}
+must be an object of a class deriving from @code{DeviceInt}.
+
+@subsection Generating and cancelling interrupt requests
+
+@cindex interrupts, generating requests for
+The class @code{DeviceInt} instance method @code{assertInt(irq)} is used
+to request an interrupt from the processor.  Your device should only
+request interrupts that have previously been connected to it using the
+interrupt controller (see above). Your device may share an interrupt
+request line with another device.  In practical terms, asserting an
+interrupt request line will cause a trap to the general exception vector
+before the next instruction.  If your device asserts an interrupt,
+it stays asserted until it is explicitly de-asserted.
+
+@cindex interrupts, cancelling requests for
+The instance method @code{deassertInt(irq)} will turn off
+the interrupt request for your device; this should be done when the
+condition that caused the device to request an interrupt has become
+satisfied. Note that this does not necessarily imply that the interrupt
+request for the processor will be turned off, as there may be another
+device trying to use that interrupt request line.
+
+For both calls, the IRQ parameter must be one of the hardware interrupt
+constants defined in @file{deviceint.h}.  It is not a good idea to use the
+general @code{exception()} method to cause interrupt exceptions, because this
+could cause excess interrupts to be generated.
+
+The place where you should make these calls and do these checks is when
+your device's code is called through the @code{periodic()}
+callback. Your device will get @code{periodic()} calls fairly often.
+
+@subsection Software interrupts vs. hardware interrupts
+
+@cindex interrupts, reserved for software
+Two of the interrupt lines (IRQ 0 and 1) are reserved for software
+use. Only the interrupts which are not reserved for software use (IRQ
+2 through 7) may be triggered by VMIPS devices.
+
+@subsection Turning interrupts off and on
+
+@cindex interrupts, enabling and disabling
+There is a global Interrupt Enable bit for the whole system; this is the
+IEc (Interrupt Enable (current)) bit, bit 0 (mask 0x001) of the Status
+register (coprocessor zero register 12).  If this bit is turned off,
+no interrupt will be triggered. Be sure to turn on your Interrupt Enable
+and Interrupt Mask (below) bits when you are testing your new
+interrupt-generating device.
+
+@cindex interrupts, masking
+Additionally, bits 15 - 8 (mask 0x0ff00) of the Status register are
+individual Interrupt Mask bits. Each bit represents a global interrupt
+enable/disable bit for the entire system per interrupt-request line. For
+example, if you turn off bit 10 of this register (mask 0x0400), the IRQ2
+line will be disabled for the whole system.
+
+Finally, it is not uncommon for individual devices to have their own
+interrupt enable/disable bits that you can set or clear. See the
+documentation for each individual device for more information.
+
+@section Error reporting
+
+When your code needs to emit warning or error messages, we recommend
+you use the following functions from @file{error.cc}:
+
+@example
+	void error(const char *msg, ...) throw();
+	void fatal_error(const char *msg, ...) throw();
+	void warning(const char *msg, ...) throw();
+@end example
+
+@code{fatal_error} will result in a call to abort() after printing the 
+error message.  All of these functions will print a newline after MSG.
+
+@section Weird things
+
+@subsection Branch on Coprocessor Zero True/False
+@cindex coprocessor zero, branch instructions
+@cindex system control coprocessor, branch instructions
+These instructions are not supposed to cause reserved instruction
+exceptions, even though the behavior of BC0F and BC0T instructions on
+MIPS-1 machines is not specified in most canonical references.
+
+On some DEC MIPS machines, the coprocessor 0 condition bit (which BC0F
+and BC0T test) is wired to the external write-buffer-empty bit; that is,
+when all stores have completed, the write buffer becomes empty, and the
+bit goes to true. This makes it possible for a hacker to write the line
+@samp{1: bc0f 1b} and thereby loop until the write buffer is empty.  However,
+this is not true of all DECstations, or of the Sony NEWS 3400.
+
+The coprocessor zero condition bit has an entirely different use on the
+R4400 and compatible processors; it is used to tell when you got a cache
+hit with a CACHE operation. The R10000 also implements this condition,
+but the bit is not wired to the coprocessor zero condition.
+
+Since VMIPS does not support CACHE operations, and does not have a write
+buffer, VMIPS emulates the case where the CpCond bit for CP0 is always
+TRUE, i.e., applications that look for the writebuffer will find that
+it is always empty.
+
+@node Test Suite, Installation, Extending, Top
+@chapter Test Suite
+
+VMIPS has a test suite with a small number of regression tests.  It uses the
+DejaGNU test framework, which is written in the Expect language.  Expect was
+written by Don Libes, and is a dialect of Tcl, the Tool Command Language by
+Ousterhout et al.
+
+@section How to run the test suite
+
+In order to run the test suite or add tests to it, you will need to have
+Expect and DejaGNU installed.  Any version of DejaGNU later than 1.3 should
+work fine. We have mostly used Expect version 5.32 or later; older versions
+may have bugs that may lead to unexpected test failures.
+
+The next step is to configure and build VMIPS from source. This is important,
+because currently, you can only run tests on a freshly built copy of VMIPS; no
+provision exists for testing a previously installed copy of VMIPS.  Simply run
+@samp{./configure} and @samp{make} from the top level source directory to
+build VMIPS. See the ``Installation'' section of the manual for more details.
+
+To run the test suite, run @samp{make check} from the top level source
+directory.  This will invoke the DejaGNU @command{runtest} command.
+It will take a minute or so, and then you will get a count of tests that
+passed and failed.  If you want to see a more comprehensive listing from
+@command{runtest}, pass it the appropriate options through the Makefile,
+by typing, for example: @samp{make RUNTESTFLAGS=--verbose check}.
+
+You can also run the test suite by changing into the @file{test_code}
+directory in the source tree and running @samp{runtest --tool vmips}.
+
+As a general rule, no tests should fail in a released version of VMIPS;
+however, CVS builds may have test failures from time to time.
+
+@section Test suite frameworks
+
+VMIPS has two comprehensive testing frameworks: the @file{regcheck}
+framework, whose tests live in the @file{vmips.regcheck} directory, and the
+@file{outcheck} framework, whose tests live in the @file{vmips.outcheck}
+directory. The former looks at the final values of registers after a test
+case is run, and the latter looks at the output that VMIPS prints out when
+a test case is run.
+
+Each of these main testing frameworks has its own @file{.exp} file that runs it.
+You can easily run the subset of the test suite controlled by a given
+@file{.exp} file, by passing its name on the @command{runtest} command line.
+For example, if you want to run all the @file{regcheck} tests, you would type:
+@samp{runtest --tool vmips regcheck.exp}.
+
+There are a few test cases that do not use either of these frameworks,
+because they have special requirements of some kind or are otherwise
+unique in some inconvenient way. These test cases have their own Expect
+drivers (@file{.exp} files) and live in the @file{vmips.misc-tests}
+directory.
+
+In addition, each test case is defined by a @file{.par} file that contains the
+parameters of the test.  If you only want to run a single test from among the
+@file{regcheck} tests, specify its @file{.par} file after an equal sign. For
+example, you might type: @samp{runtest --tool vmips regcheck.exp=mumble.par}
+to run only the @file{mumble.par} @file{regcheck} test.
+
+@section How to add a test to the test suite
+
+To write a new test case, first decide whether it is easier to have your test
+case print out something or to look at the @option{haltdumpcpu} option's output
+to verify it. This will tell you whether it should be an @file{outcheck} test
+(if it prints out something) or a @file{regcheck} case (if you look at the
+register values).  Then write up a @file{.par} file for the test case ---
+the best way to learn how to do this, for the time being, is to examine the
+examples in the @file{test_code} directory. Then move the @file{.par} file
+and the test code (assembly or C) to the appropriate subdirectory for the
+framework you chose, @file{vmips.regcheck} or @file{vmips.outcheck}. Now
+you can try to make sure that it passes (or fails, as the case may be),
+by running @samp{runtest --tool vmips} on it.
+
+Also, note that you shouldn't add another test to @file{vmips.misc-tests}
+unless you can't find a way to fit it into any of the existing testing
+frameworks. Adding a test to @file{vmips.misc-tests} is tricky -- you may be
+able to make progress by looking at the other @file{.exp} files in that
+directory.
+
+@section Common problems
+
+You can get screenfuls of @samp{endian_option was not set} errors if you run
+@command{runtest} without first making a DejaGNU @file{site.exp} configuration
+file first.  To make a @file{site.exp} file, just run @samp{make site.exp}
+in the @file{test_code} directory.
+
+@section Additional test cases needed
+
+Test cases should probably be added for the following categories of VMIPS
+behaviors. (This list is from 2002; it is probably a good start, but it
+may be out of date in the sense that it is unlikely to be exhaustive.)
+
+@itemize
+@item Vmipstool.
+@item The debugger interface.
+@item Exceptions: exception prioritizing, non-boot-time exception vectors,
+all the TLB exceptions, Unimplemented Coprocessor exceptions, Reserved
+Instruction exceptions, and exceptions due to PC address translation.
+@item Check that the TLB does the right thing when you have a dirty entry
+vs. a non-dirty one.
+@item dumpcpu, dumpcp0, haltdumpcp0, bootmsg options.
+@item tilde_expand() where it's not your own home directory.
+@item Address translations in KSEG0 or KSEG2 or KUSEG or User mode.
+@end itemize
+
+@node Installation, Reporting Bugs, Test Suite, Top
+@appendix Installation
+
+VMIPS uses the GNU Autoconf/Automake system for configuration management.
+This provides the familiar @command{configure} shell script interface for
+setting configuration variables before compiling VMIPS. This means that the
+traditional @samp{./configure; make; make install} sequence should work.
+For more information about the special options that VMIPS @command{configure}
+accepts, read on, or give the @option{--help} option to @command{configure}
+for an abridged version.
+
+@section Prerequisites
+
+The VMIPS build process assumes that you have a C++ compiler installed
+on the host machine. Any reasonably recent, ISO C++-compliant compiler
+with working template function handling should work.  Some ancient
+compilers, such as the system compiler on Red Hat Linux 6.x systems,
+will not work. @command{configure} contains checks for a few known compiler
+problems which will prevent VMIPS from working, and will print an error
+message if it detects such a problem.
+
+@cindex sample code, building
+If you want to build any of the sample code which is included with the
+VMIPS source distribution, you must have a full set of GNU MIPS cross
+compilation tools installed when you configure VMIPS.  You will need to
+tell @command{configure} the configuration prefix you used to install
+the MIPS tools, by specifying it as the value to the @option{--with-mips}
+argument. For example, if your MIPS cross compiler is
+@file{/opt/mipsTools/bin/mips-dec-ultrix4.3-gcc}, then you should specify
+@option{--with-mips=/opt/mipsTools} on the @command{configure} command
+line. Additionally, you will also need to tell @command{configure} the
+target you used to configure the MIPS cross tools, by specifying it as the
+value to the @option{--target} argument (see below).  For a concise summary
+of how to build the necessary MIPS cross tools, read ``Building MIPS Cross
+Tools'', below.
+
+@cindex test suite, running
+If you want to run the test suite, you must additionally have Expect and
+DejaGNU installed (any version published since 2000 should be fine). Once
+VMIPS is compiled, you can type @samp{make check} to run the test suite.
+
+@section Building from CVS
+
+@cindex configure, missing
+@cindex configure, creating
+If you retrieved your sources from the CVS repository, you will need
+Automake version 1.11.1 or later, Autoconf version 2.68 or later, and libtool
+2.2.10 or later.  You will need perl 5 to build the documentation.
+Your distribution will be missing many important files, including
+@command{configure}. To generate these, run @command{utils/bootstrap}. To
+automatically run configure once it has been generated, you can run
+@samp{utils/bootstrap -c CONFIGURE-ARGS}.
+
+@section Options that configure supports
+
+If you want to build VMIPS with particular compiler optimizations or
+with debug symbols, see the example in @file{INSTALL} describing how you
+can set @var{CFLAGS}. You will want to do the same for @var{CXXFLAGS}.
+By default, if your system compiler is GNU gcc, VMIPS will be built using 
+@option{-g -O2}.
+
+@pindex configure
+@cindex configure, options supported by
+Some of the interesting options that @samp{configure} supports are as
+follows:
+
+@table @option
+@item --target=T
+Specify the target used to configure your MIPS cross tools. @samp{T} must
+match the value of the @option{--target} option provided to GNU Binutils
+@command{configure}. 
+
+@item --with-mips=MDIR
+Specify installation prefix of MIPS cross tools (default MDIR = /opt/mips).
+If you do not have MIPS cross tools, the VMIPS test suite will not be
+available and sample code will not be built. If you want @command{configure}
+to ignore your MIPS cross tools, you can indicate this by specifying
+@samp{--without-mips}. 
+
+This flag is used to set the default value of the vmipsrc
+@option{mipstoolprefix} option. You can always edit the @option{mipstoolprefix}
+option setting in @file{/etc/vmipsrc} after installation if you want to
+change its value.
+
+@item --with-mips-bin=DIR
+Specify path to MIPS cross tools' executables (default MDIR/bin). This option
+may be useful as an override if --with-mips isn't working for you, but beware
+--- it is rarely tested by the developers.
+
+@item --with-mips-endianness=VAL
+Specify the default endianness of the VMIPS simulated machine, which must match
+the MIPS cross tools target's endianness.  VAL may be specified as @code{big}
+or @code{little}.  If you have installed MIPS cross tools, it is best to let
+configure guess this (which it will do by running @samp{mips-objdump -i}),
+unless you have reason to believe it is guessing wrong, because if you get
+it wrong, vmipstool may compile ROMs that do not run correctly under vmips.
+If you are configuring without MIPS cross tools installed, this will default
+to little-endian.
+
+This flag is used to set the default value of the vmipsrc @option{bigendian}
+option. You can always edit the @option{bigendian} option setting in
+@file{/etc/vmipsrc} after installation if you want to change this value.
+
+@item --enable-profiling
+Include (default=do not include) profiling instrumentation in the VMIPS
+binary. This is only interesting if you are maintaining VMIPS and trying
+to figure out why it is running more slowly than it should be. When we
+last tried it, this option didn't seem to work very well on Mac OS X.
+
+@end table
+
+@section Post-Installation Setup
+
+If you are an end-user with a binary package for VMIPS and a MIPS cross
+compiler, you will probably want to make Vmipstool use the cross compiler
+when you run commands such as @command{vmipstool --compile}.
+
+You should edit your @file{/etc/vmipsrc} or @file{~/.vmipsrc} file and change
+the @option{bigendian} and @option{mipstoolprefix} options to correspond
+to the installed MIPS cross tools. (See the `Customizing' chapter for more
+information on the syntax of these options.) Then, test it by trying to compile
+a C file by running @command{vmipstool --compile -c foo.c}. You should get
+an object file (@file{foo.o}) of the right endianness and object format;
+you can check this using the @command{file} command on most Unix systems.
+
+@section Packaging VMIPS
+
+If you are a system integrator or distributor who is building a package
+for VMIPS intended for distribution, you may be able to start by looking at
+the RPM vmips.spec file or the Debian dpkg packaging files included in the
+source distribution.
+
+Your VMIPS package need not require a set of MIPS cross tools either at the
+build or install stage.  Starting with VMIPS 1.2, it is perfectly possible
+to build VMIPS without a cross-compiler, cross-assembler, or cross-linker.
+Vmipstool will not be very useful without cross-tools, but it will build;
+however, an end-user can install cross-tools and edit the system-wide
+@file{vmipsrc} file to make the @option{mipstoolprefix} option value contain
+their location.
+
+The VMIPS binary package should probably include the following files:
+@itemize
+@item the two executables @command{vmips} and @command{vmipstool}
+@item the two man pages @file{vmips.1} and @file{vmipstool.1}
+@item the VMIPS Programmer's Manual in some format (for example, the Info file
+@file{vmips.info}) 
+@item the default GNU linker script used by vmipstool, @file{ld.script}
+@item the system-wide configuration file @file{/etc/vmipsrc}
+@item the assembler convenience header file @file{asm_regnames.h}
+@end itemize
+
+Help keep VMIPS free! As VMIPS is released under the GNU General Public
+License, please make an effort to distribute sources (or at least, post a
+link to the sources) if you distribute binaries or binary packages. Thanks!
+
+@section Building MIPS Cross Tools
+
+First decide on an installation prefix. The following examples will
+use the prefix @samp{/opt/mips}, as above, which is the default place that
+the VMIPS @command{configure} script looks for them; you can however use any
+prefix you wish.
+
+@cindex GNU Binutils, obtaining
+Download a copy of Binutils, from any GNU mirror, or from the URL:
+@display
+@url{ftp://sources.redhat.com/pub/binutils/releases}
+@end display
+The most recently-tested version is 2.20.1.
+
+Build binutils by running the following commands.  We recommend
+@code{--disable-nls} because some versions do not build correctly with
+NLS (linking against @file{libopcodes.a} results in unresolved symbols.)
+
+@example
+./configure --target=mipsel-ecoff --prefix=/opt/mips \
+ --disable-nls --disable-shared
+make
+make install install-info
+@end example
+
+@pindex gcc
+@cindex GNU Compiler Collection, obtaining
+Download a copy of the GNU Compiler Collection (@command{gcc}) from
+any GNU mirror, or from the URL:
+@display
+@url{ftp://gcc.gnu.org/pub/gcc/releases}
+@end display
+
+Our examples assume that you want to use the ECOFF binary format,
+so we recommend you get gcc version 3.0.4.  If you would prefer to
+use the ELF binary format, pretty much any recent version of gcc
+will work, but note that you will need to pass @code{--target=mips-elf}
+instead of @code{--target=mipsel-ecoff} when configuring both
+binutils and gcc. We have most recently tested version 4.2.4 with
+the ELF format.
+
+@cindex GNU Compiler Collection, installing
+You can read the documentation for building the compiler by pointing
+your World-Wide Web browser at @url{http://gcc.gnu.org/install}.
+When you encounter difficulties, you should consider consulting the
+documentation for building the compiler, because it is more complete
+than the following summary.
+
+@enumerate
+@item Unpack the sources. Let's say you unpack them in @file{/usr/build},
+creating the directory @file{/usr/build/gcc-3.0.4}.
+
+@item Create the build directory @file{/usr/build/gcc-mips-build}.
+
+@cindex GNU Compiler Collection, configuring
+@item First, add the directory @file{/opt/mips/bin} (where you just installed
+Binutils) to your path, so that the compiler configuration process can
+find your MIPS-targetted assembler and linker.
+
+@item Configure the compiler. Change to the directory
+@file{/usr/build/gcc-mips-build} and issue the following command. (The
+back-slash characters represent the usual Unix shell convention of continuing
+a command on the following line, and are inserted for typesetting purposes.)
+
+@example
+../gcc-3.0.4/configure --target=mipsel-ecoff \
+ --prefix=/opt/mips --with-gnu-as --with-gnu-ld \
+ --disable-threads --disable-nls --disable-shared \
+ --enable-languages=c
+@end example
+
+@item If the configuration step fails, make sure you have a working native
+compiler, and/or try a different version of gcc. Otherwise, proceed to compile
+the compiler:
+
+@example
+make -k MAKE='make -k TARGET_LIBGCC2_CFLAGS=-Dinhibit_libc' cross 
+make -k LANGUAGES=c install
+@end example
+
+The reason @samp{make -k} is required is because some parts of the gcc
+toolkit may fail to build, but the compiler itself may be OK.
+
+The @option{-Dinhibit_libc} option is required when you are building
+the compiler in the absence of a MIPS C library, as is often the case
+with VMIPS users.
+
+Do not be alarmed by errors in building or installing the compiler;
+the cross compiler install interface is less than polished.
+
+@item You should be able to use the newly-installed  compiler to compile
+(but not link) a program that does not use any C library functions.
+If this works, you should be able to use the cross tools you have just
+built for VMIPS.
+
+@item If you want to use the GNU debugger (GDB) to debug MIPS programs running
+on VMIPS, you can build that now.
+
+@enumerate
+@item Download a copy of the GNU debugger from any GNU mirror, or from
+the URL:
+@display
+@url{ftp://ftp.gnu.org/pub/gnu/gdb/}
+@end display
+We recommend version 6.0 or later. Download the file @file{gdb-6.0.tar.gz}.
+
+@item Unpack the file and change to the directory @file{gdb-6.0}.
+@item Type the following commands to configure and build GDB:
+@example
+./configure --prefix=/opt/mips --target=mipsel-ecoff
+make
+make install install-info
+@end example
+
+@item You can now use the newly installed @file{mipsel-ecoff-gdb} to debug
+programs with VMIPS, as described in the ``Debugging'' section of the manual.
+@end enumerate
+
+@item If you want to build a MIPS C library, you can also do that now, but
+it is not strictly required for many useful VMIPS tasks.
+
+Here is how to build the uClibc C library for use with VMIPS:
+
+As noted in the uClibc INSTALL file, you will need Linux kernel
+sources.  Just pick a recent version of Linux 2.4; you can download it
+from @url{http://www.kernel.org} or one of its mirrors, if you don't have
+it handy.  You will need to configure (but not build) the Linux kernel for
+MIPS. Here's how:
+
+@itemize
+@item Edit @file{linux/Makefile}, setting @var{ARCH} to @samp{mips} and setting
+@var{CROSS_COMPILE} to a value that corresponds to the path where your MIPS
+cross compiler is installed, for example: @samp{/opt/mips-elf/bin/mips-elf-}
+(this is just like @option{mipstoolprefix} in your @file{vmipsrc} file).
+
+@item Copy @file{arch/mips/defconfig} to @file{.config}.
+
+@item Run @samp{make oldconfig} and @samp{make dep}.
+@end itemize
+
+Next, download uClibc from @url{http://www.uclibc.org}, and unpack it
+next to the Linux kernel sources. The last version we tested was 0.9.29.
+Read the @file{INSTALL} file in that distribution.
+
+When you configure uClibc with @samp{make config}, be sure to pick @samp{mips}
+as your Target Architecture, and @samp{Generic (MIPS I)} as your Target
+Processor. Be sure to pick the correct endianness (that is, the one which
+corresponds to the default endianness of your cross tools.) You should be sure
+to answer yes to 'Target CPU has a memory management unit (MMU)' and no to
+'Enable floating point number support', because current versions of VMIPS
+do not include floating-point support.  If you are intending to use uClibc
+to build ROMs, you will probably want to turn off position-independent code
+and shared library support.  Turn on only those other features of uClibc
+as you expect you will need.
+
+Create a new directory into which uClibc will be installed.
+This will be your @var{PREFIX}.
+
+Run @samp{make CROSS=/opt/mips-elf/bin/mips-elf-} to build uClibc. For
+@var{CROSS}, you should use the same value as you used for @var{CROSS_COMPILE}
+in the Linux Makefile, above.
+
+Run @samp{make CROSS=... PREFIX=... RUNTIME_PREFIX=/ DEVEL_PREFIX=/usr/
+install} to install it, specifying the same @var{CROSS} value and
+the name of the directory created earlier as @var{PREFIX}.
+In the directory you specified for @var{PREFIX},
+you will now have @file{usr/include} and @file{usr/lib}
+subdirectories. You will now want to rebuild GCC, specifying these directories
+using the @samp{--with-headers} and @samp{--with-libs} options to the GCC @samp{configure} script, respectively.
+This will cause the directories to be copied to
+
+@itemize
+@item @var{prefix}/@var{target-triplet}/lib  (for libraries)
+@item @var{prefix}/@var{target-triplet}/sys-include  (for includes)
+@end itemize
+
+@end enumerate
+
+@node Reporting Bugs, Future Directions, Installation, Top
+@appendix Reporting Bugs
+
+We are always interested in hearing about VMIPS bugs.
+Please send mail to @code{vmips@@dgate.org} and tell us about them.
+Please include at least the following information:
+
+@itemize @bullet
+@item your operating system
+@item your host processor type
+@item your C++ and C compiler type and version
+@item the version of VMIPS you are using
+@item how you configured VMIPS
+@item how to trigger the bug
+@item what you expected to see
+@item how what you saw differed from what you expected to see
+@item how you think it could be fixed (send a patch if you have one)
+@end itemize
+
+@node Future Directions, Release History, Reporting Bugs, Top
+@appendix Future Directions
+
+The following is a list of things we would like to add to VMIPS. Please get in
+touch with us if you think you would be willing to help.
+
+@itemize @bullet
+@item Cache and DMA support in the memory subsystem.
+
+@item A just-in-time translator from MIPS machine code to the host's
+machine code. X86 and PowerPC would probably be the first hosts to target.
+
+@item Add meaningful bindings to an extension language such as Tcl/Tk.
+In particular, it should be possible to read or write option values,
+modify the configuration of the machine (by attaching or removing devices,
+for example), and type commands interactively to VMIPS.  There should
+be some provision for refreshing cached option values if the extension
+language changes them.
+
+@item Modularize the devices, and potentially even the CPU and memory mapper
+using a shared-library plug-in model.
+
+@item Make it so that the debugger can be attached and detached at any
+time, without the user having had to think of it beforehand and supply
+the debug option. Delay the debugging interface initialization until a
+connection is received?
+
+@item Graphical user interface with register and memory display and editing,
+support for loading, running, and stepping programs, and setting breakpoints.
+
+@item Extend the current executable loader (in vmips/exeloader.cc) to support:
+@itemize
+@item loading ELF-format files
+@item loading files into user space (This will require some sort of built-in
+TLB-miss handling.)
+@end itemize
+
+@item Support for non-English languages using NLS.
+
+@item A reasonable FPU emulator.
+
+@item ROM monitor network booting support.
+
+@item Full MIPS32 support.
+
+@item Checkpoint and restart of simulations.
+
+@item Develop a patch for gas to support software register names.  gas supports
+$sp and $gp but not, say, $t0.
+
+@item Consolidate some of the .h files that just contain huge lists of useful
+constants.
+
+@end itemize
+
+@node Release History, References, Future Directions, Top
+@appendix Release History
+
+vmips-1.5.1 was released on 20 August 2018.
+User-visible changes in version 1.5 (since version 1.5.1):
+
+@itemize @bullet
+@item Bug fixes:
+
+@item A pair of time calculations in the clock device were revised to
+avoid triggering compile-time errors in newer C++11-compliant compilers.
+@end itemize
+
+vmips-1.5 was released on 17 November 2014.
+User-visible changes in version 1.5 (since version 1.4.1):
+
+@itemize @bullet
+@item New features/improvements:
+
+@item VMIPS now includes a basic direct-mapped cache simulation. The cache
+isolation and cache swap bits in the CP0 Status register are now
+honored.
+
+@item The boot monitor distributed with VMIPS now sets up a dummy @code{argv[0]}
+value for the loaded program. Also, it halts by entering an infinite
+loop rather than attempting to execute a @samp{break} instruction when
+it encounters an unexpected exception.
+
+@item The setup assembly routine distributed with VMIPS has been made
+more TLB-friendly. Identity virtual-to-physical mappings for the
+first few pages of physical RAM are installed in the TLB at program
+start time.
+
+@item When @option{-o excmsg} is on, TLB miss addresses will be printed to
+stderr.
+
+@item When @option{-o ttydev=stdout} is specified, simulated program output
+will be sent to VMIPS's standard output, even if it is not a tty.
+
+@item The interactor can now disassemble memory. Also, stepping in the
+interactor now prints the PC after each step.
+
+@item VMIPS now supports more of the GDB remote serial protocol, in support of
+the GDB @command{info threads} and @command{detach} commands. The
+debug protocol TCP port is now configurable via the @option{-o
+debugport} option. Also, if something halts the program while the
+debugger interface is active, VMIPS will tell GDB that the program
+exited.
+
+@item Bug fixes:
+
+@item A bug was fixed in the debugger interface where disconnecting from
+the debugger socket could cause vmips to enter an infinite loop.
+
+@item The interactor will refuse to dump raw memory words at non-word-aligned
+addresses.
+
+@item The CP0 Cause register IP field is now recomputed whenever the
+register is read, rather than only when exceptions happen. This
+makes polling loops with interrupts disabled work correctly.
+
+@item A bug was fixed in the DECstation-compatible clock device which was
+preventing some of its registers from being zeroed properly.
+
+@item Some endianness bugs were fixed in the generic memory-mapped device
+code and in the DECstation-compatible serial device.
+@end itemize
+
+vmips-1.4.1 was released on 7 May 2013.
+User-visible changes in version 1.4.1 (since version 1.4):
+
+@itemize @bullet
+@item Problems compiling VMIPS with gcc 4.7.x have been fixed.
+
+@item An error has been fixed in the documentation regarding the installed
+location of the canned setup code.
+
+@item An error has been fixed in the Makefiles which was preventing the
+canned setup code from being installed.
+
+@item An error has been fixed in the Makefiles which was preventing
+CFLAGS and LDFLAGS from being set correctly in some cases.
+@end itemize
+
+vmips-1.4 was released on 29 January 2012.
+User-visible changes in version 1.4 (since version 1.3.2):
+
+@itemize @bullet
+@item A new interaction facility was implemented. This allows you
+to suspend the simulation, print registers and memory, and then
+continue by running or single-stepping, without needing to use a
+full-fledged debugger.
+
+@item Some of the memory-mapped I/O devices have had endianness
+bugs fixed and debugging printouts removed.
+
+@item Certain coprocessor zero branch instructions no longer
+unnecessarily cause reserved instruction exceptions.
+
+@item Other minor optimizations.
+@end itemize
+
+vmips-1.3.2 was released on 27 March 2007.
+User-visible changes in version 1.3.2 (since version 1.3.1):
+
+@itemize @bullet
+@item A bug was fixed in the code which responded to address-translation
+exceptions by loading the CP0 Context register. It was loading the
+wrong virtual page number.
+
+@item Problems compiling VMIPS with gcc 4.1.x have been fixed.
+
+@end itemize
+
+vmips-1.3.1 was released on 5 January 2005.
+User-visible changes in version 1.3.1 (since version 1.3):
+
+@itemize @bullet
+@item VMIPS now compiles and passes most of its regression tests
+under Microsoft Windows using Cygwin. There is one known failure
+(misc-tests/echo), but the failure stems from the testsuite, not VMIPS;
+I suspect that my old version of Expect is at fault.
+
+@item The build status report script, @file{buildstat.sh}, has been
+removed from the distribution.  (Since it was broken in version 1.3 and
+no one complained, we're assuming that no one will miss it much!)
+
+@item Two bugs in the testsuite that could have led to spurious test
+failures have been fixed.
+@end itemize
+
+vmips-1.3 was released on 8 October 2004.
+User-visible changes in version 1.3 (since version 1.2.2):
+
+@itemize @bullet
+@item The VMIPS code base has been cleaned up substantially. The most
+important visible effect of this is that VMIPS compiles much more quickly now.
+
+@item A new, experimental executable-file loader has been integrated. Presently
+it is only usable for loading ECOFF files into the kernel segments
+(0x80000000-0xbfffffff). The ROM monitor has a new @command{call} command you
+can use to take advantage of this.
+
+@item Vmipstool can now disassemble binary instructions from the command
+line, e.g.  @samp{vmipstool --disassemble-word <pc> <instr>}.
+
+@item The @option{excmsg} option used to report all exceptions, including
+things like clock interrupts. This made using @option{excmsg} in any
+nontrivial kernel code almost impossible. Now you must also specify
+'reportirq' to get reports of interrupt exceptions.
+
+@item The @option{haltjrra} option has been removed.
+
+@item The DECstation 5000/200-compatible CSR device now supports delivery
+of interrupts from devices attached to CSR interrupt lines, such as the DZ11
+serial device.
+
+@item The DZ11 serial device now supports interrupt-driven I/O properly. It
+previously only worked correctly if polling was used.
+
+@item The documentation has received the usual slight adjustments. In
+addition, the test-suite documentation has been extensively revised and
+integrated into the programmer's manual.
+
+@item The options-processing code has been revised slightly to print a better
+error message when an invalid option is specified.
+@end itemize
+
+vmips-1.2.2 was released on 23 August 2004.
+User-visible changes in version 1.2.2 (since version 1.2.1):
+
+@itemize @bullet
+@item A bug in the Makefiles and configure scripts has been fixed, where
+some files would not be installed if you didn't configure with cross
+compilation tools (using @option{--with-mips}).
+
+@item Vladimir Machulsky found and fixed a bug in the debugger interface,
+where the register file would be sent to gdb incorrectly. Thanks!
+
+@item VMIPS will no longer abort and dump core when bad command-line
+rguments
+are passed to it.  Instead, it will print an error message and exit with
+a non-zero exit code.
+
+@item A bug in the command-line option processor was fixed, where using a
+completely empty @file{~/.vmipsrc} or the @samp{-F /dev/null} option could cause
+the options parser to parse garbage, usually resulting in harmless,
+but annoying error messages.
+@end itemize
+
+vmips-1.2.1 was released on 26 July 2004.
+User-visible changes in version 1.2.1 (since version 1.2):
+
+@itemize @bullet
+@item Fixed a bug where delay slot execution could be triggered even when
+emulating a malformed jr (jump-register) instruction.
+
+@item Fixed a bug where, upon taking a TLB Miss exception, the ASID of the
+page that could not be looked up would be overwritten (in the CP0 EntryHi
+register) with garbage.
+
+@item Fixed a bug in VMIPS configurations with multiple interrupt devices,
+where Interrupt Pending bits of the CP0 Cause from previous interrupts could
+be left asserted even if the device that asserted them had subsequently
+deasserted them.
+
+@item Fixed a bug where the memory dump file and ROM file would be opened
+in text mode. They are now opened in binary mode.
+@end itemize
+
+vmips-1.2 was released on 26 June 2004.
+User-visible changes in version 1.2 (since version 1.1.3):
+
+@itemize @bullet
+@item Many documentation updates have been made. Note that the documentation
+has been relicensed under the MIT license, instead of the GNU FDL.
+
+@item Many facets of VMIPS are now configurable at runtime, instead of at
+compile time. For instance:
+
+	It is now possible to build and install VMIPS without having previously
+installed MIPS cross-compiler tools. In particular, VMIPS now incorporates
+the portions of GNU libopcodes used to implement the MIPS disassembler,
+so linking against an installed version of libopcodes from GNU binutils is
+no longer necessary.
+
+	It is now possible to switch the VMIPS CPU from big-endian to
+little-endian mode or vice-versa using a command-line option.
+
+	It is now possible to change the name of the configuration file
+that VMIPS reads on startup using a command-line option. The @option{-o
+configfile} option, which never worked, has been removed.
+
+@item vmipstool now shares command-line processing code with vmips. It also
+has a new --swap-words option that allows you to byteswap all the 4-byte
+words in a file.
+
+@item You can now specify numeric constants in command line options which
+are multiples of 1024, 1024^2, or 1024^3 using the K, M, or G suffixes.
+
+@item Several new emulated devices based on the DECstation 5000/200 have
+been added.  In particular, it is no longer possible to disable the serial
+device at compile time (or with @option{-o nousetty}), but you can choose
+whether to use the DECstation serial chip or the SPIM-compatible serial
+console (or neither) using new command-line options. In addition, the ROM
+program distributed with VMIPS supports a "boot environment" similar to
+that provided by the DECstation PROM. The new DECstation-compatible devices
+have not been comprehensively validated; they should be considered "beta"
+quality at this point.
+
+@item There is a new tracing framework you can use to generate runtime
+execution traces of programs that run in VMIPS. See the documentation of the
+"tracing" command-line option and the other options that begin with "trace"
+for more details.
+
+@item The VMIPS interface to GDB now supports the "remote Z-packet" interface
+for setting breakpoints.
+
+@item VMIPS now prints more informative diagnostic messages about the causes
+of bus errors and interrupts.
+
+@item You can now use ^C (your terminal's Interrupt key) to stop VMIPS and
+break into the debugger, if the @option{-o debug} command line option was
+set, or ^\ (your terminal's Quit key) to halt VMIPS in an orderly manner at
+any time.
+
+@item The @option{--disable-debug} option to @code{configure} now strips the
+compiled VMIPS binaries, although it has been documented to do this for some
+time now.
+@end itemize
+
+vmips-1.1.3 was released on 24 October 2003.
+User-visible changes in version 1.1.3 (since version 1.1.2):
+
+@itemize @bullet
+@item A bug in comparing large immediate constants near UINT_MAX using
+the sltiu instruction has been fixed.
+
+@item A bug where the meaning of the `dirty' bit in TLB entries was
+accidentally reversed has been fixed.
+
+@item A bug in specifying which bits are treated as writable in the CP0
+EntryLo register by the tlbr instruction has been fixed. Thanks to Mingyu
+Chen for pointing out these last two bugs.
+@end itemize
+
+vmips-1.1.2 was released on 20 August 2003.
+User-visible changes in version 1.1.2 (since version 1.1.1):
+
+@itemize @bullet
+@item An instruction that turns on interrupts in the system control coprocessor
+  (coprocessor 0) will no longer immediately take an exception if an interrupt
+  is pending; now it will happen at least one instruction later.
+
+@item When building VMIPS in debug mode, the coprocessor 0 Cause register may no
+  longer contain random, non-clearable interrupt-pending bits.
+
+@item The coprocessor 0 Cause register's interrupt-pending and coprocessor-error
+  bits are now correctly updated when an exception is taken.
+
+@item The VMIPS physical-memory manager will now allow you to place two devices
+  directly adjacent to one another in memory; it used to complain that they
+  overlapped, when they actually did not.
+
+@item A typo was fixed in the testsuite documentation.
+@end itemize
+
+vmips-1.1.1 was released on 16 June 2003.
+User-visible changes in version 1.1.1 (since version 1.1):
+
+@itemize @bullet
+@item A bug involving shifts by 0 or 32 bits (e.g., using instructions like srlv)
+  producing incorrect results has been fixed.
+
+@item The absence of an FPU attached to coprocessor slot 1 can now be
+  detected by user programs.
+
+@item The system control coprocessor (coprocessor 0) now returns the correct ID
+  number for the R3000A processor in the PRId register.
+
+@item Emulation of store-byte and store-halfword operations for emulated devices
+  that only support store-word should now work correctly on byte-swapped
+  configurations.
+
+@item A bug in vmipstool which caused it to fail to find alternate linker scripts
+  (supplied with the --ld-script option) has been fixed.
+
+@item A gcc warning caused by a (harmless) comment in asm_regnames.h has
+  been quashed.
+
+@item A bug where little-endian vmips configurations would dump core when
+  the disassembler was used (e.g., when the instdump option was turned on)
+  has been fixed.
+
+@item `configure' no longer ignores its --with-mips-include option.
+@end itemize
+
+vmips-1.1 was released on 14 March 2003.
+User-visible changes in version 1.1 (since version 1.0.4):
+
+@itemize @bullet
+@item If you are using g++ to compile VMIPS, you must use g++ version 2.95
+  or later. Also, you must specify the --target option to `configure',
+  with an argument that matches the --target option to binutils
+  `configure'. See `INSTALL'.
+
+@item VMIPS now supports GNU standard --help and --version options.
+
+@item The manual now includes improved documentation for using gdb and
+  Insight to control VMIPS, a section on the differences between SPIM's
+  console and the SPIM-compatible console device, a section on proper
+  error reporting from VMIPS extensions, and many other minor
+  revisions.
+
+@item Using gdb to control VMIPS is now much more robust in the face of
+  errors and exceptions.
+
+@item VMIPS 1.1 makes it possible to use the 2nd display/keyboard channel
+  of the SPIM-compatible console device, using the `ttydev2' option.
+
+@item VMIPS now includes a halt device, which can be used to halt the
+  simulator without using a special instruction.
+
+@item VMIPS 1.1 is much faster than VMIPS 1.0.4. This is due in large part
+  to the efforts of Paul Twohey, who reimplemented the clock and
+  SPIM-compatible console devices, and cleaned up the code a bit.
+
+@item The VMIPS distribution now includes a regression test suite, based on
+  DejaGNU (replaces the old test_code directory). In order to support
+  this, the formats of lots of random messages that VMIPS prints out
+  have changed.
+
+@item We now support 64-bit hosts (e.g., Alpha). 
+@end itemize
+
+vmips-1.0.4 was released on 28 April 2002.
+User-visible changes in version 1.0.4 (since version 1.0.3):
+
+@itemize @bullet
+@item Fixed bug where the first instruction of an interrupt handler would be
+  executed twice in a row. Thanks to Paul Twohey.
+
+@item Workaround some problems in the way casts are used in VMIPS by specifying
+  -fno-strict-aliasing to gcc in configure; this should help avoid
+  miscompilations for now, until the code can be rewritten for cast-safety.
+
+@item Fix bug where vmips would dereference a NULL pointer when trying to use a
+  SPIMConsole device with a non-attached serial host. Thanks to Paul Twohey.
+
+@item Reorder some tests in the SPIMConsole code for a slight speedup when
+  interrupts are turned off.
+
+@item Fix bug where virtual page numbers were being incorrectly interpreted
+  by the system control coprocessor, resulting in excess TLB misses being
+  generated. Thanks to Sanjeev Datla.
+@end itemize
+
+vmips-1.0.3 was released on 12 January 2002.
+User-visible changes in version 1.0.3 (since version 1.0.2):
+
+@itemize @bullet
+@item Fixed bug in debugger interface; TLB translations caused by the debugger
+  trying to access user space could fail if the virtual page number was
+  not 0.
+
+@item Fixed bugs in the following instructions: lb, lh, lwr, lwl, swr,
+  swl, nor.
+
+@item Clarified some especially confusing comments in the source code,
+  in one of the test cases, and in the testsuite README.
+
+@item The sample setup code now halts on all exceptions, including user TLB
+  miss exceptions.
+
+@item Fixed some warnings compiling xmboot using recent versions of gcc.
+@end itemize
+
+vmips-1.0.2 was released on 17 December 2001.
+User-visible changes in version 1.0.2 (since version 1.0.1):
+
+@itemize @bullet
+@item Add warning message to man page directing the interested reader to the
+  Info manual.
+
+@item New default handling of `-o ttydev' option; manual updated.
+
+@item /etc/vmipsrc contains only comments by default.
+  These two fixes work around a bug in Darwin select(2)'s tty handling.
+
+@item Only print host processor endianness if `-o bootmsg' is set.
+  Fixes bug where `-o bootmsg' should (but doesn't) turn this message off.
+
+@item Remove test_code/testdev.S from the branch.
+  This is a test for a feature (TestDev) which wasn't distributed with 1.0.x.
+
+@item Comment out extra tokens after #endif in test_code/@{sort.c,tester.c@}.
+  Fixes bug where gcc 3.0 gives warnings compiling these files.
+@end itemize
+
+vmips-1.0.1 was released on 27 November 2001.
+User-visible changes in version 1.0.1 (since version 1.0):
+
+@itemize @bullet
+@item Fixed format-string bug in vmipstool.
+
+@item Fixed "extra tokens after #endif" warning in sample_code/asm_regnames.h.
+@end itemize
+ 
+vmips-1.0 was released on 28 October 2001.
+User-visible changes in version 1.0 (since version 0.9):
+
+@itemize @bullet
+@item A standard clock device has been added.
+
+@item The "vmipstool" front end to compilation tools was added, and most of
+  the random scripts lying around have been consolidated into it.
+
+@item The memory-mapped test device known as "TestDev" has been removed.
+
+@item Debian and Red Hat packaging files have been added.
+
+@item The installation procedure has been greatly improved.
+
+@item The VMIPS manual has been completed.
+
+@item Many, many bugs fixed as a result of a concerted attempt at testing
+  everything.  Doubtless, some bugs still remain.
+
+@item Some portability fixes.
+
+@item Dumping of the stack (when registers are dumped) now works.
+
+@item Many strange messages the debugger backend used to print out have been
+  quelled. Also, killing the debugger connection should no longer cause
+  a crash.
+
+@item vmips now supports --help, --version and --print-config command-line
+  options.
+
+@item The SPIM-compatible console device now works better when the host
+  machine is byte-swapped with respect to the MIPS target.
+@end itemize
+
+vmips-0.9 was released on 9 May 2001.
+User-visible changes in version 0.9 (since version 20001014):
+
+@itemize @bullet
+@item vmips.debug is no longer built.
+
+@item Read-only memory is now really read-only.  This allowed us to add
+  debugger support for breakpoints in ROM.
+
+@item Debugger support for exception handling -- CPU exceptions are now
+  delivered to your GDB, if it is attached, giving you a chance to poke
+  around before the target is made aware of the condition.
+
+@item Many tasty configury updates, making it easier to build.
+
+@item Miscellaneous bugs fixed in many places.
+
+@item Branch on coprocessor 0 instructions now have defined behavior.
+
+@item Many places which erroneously had text after #endif in the source have
+  been corrected to use comments instead, allowing you to compile vmips
+  with newer C++ compilers.
+
+@item Some old test code that used to run at the beginning of every vmips
+  job has been removed, so you will no longer see the familiar messages
+  it printed out.
+@end itemize
+
+User-visible changes since version 20000517:
+
+@itemize @bullet
+@item Emulating a little-endian MIPS on a big-endian host passes preliminary
+  tests.  Build process queries MIPS tools for their endianness
+  automatically.  Builds tested on Solaris SPARC, i386 Linux, FreeBSD
+  and HP-UX.  Distribution building (gmake distcheck) almost works.
+@end itemize
+
+User-visible changes since version 19991114:
+
+@itemize @bullet
+@item Polling input and output via the SPIM-compatible console device now work.
+@end itemize
+
+User-visible changes since version 19990829:
+
+@itemize @bullet
+@item Build processes seeks out MIPS tools; Installation documentation now
+  briefly documents how to build cross tools. 
+@end itemize
+
+User-visible changes since version 19990823:
+
+@itemize @bullet
+@item Spim console documentation completed; first attempt at spim console code.
+@end itemize
+
+User-visible changes since version 19990801:
+
+@itemize @bullet
+@item Documentation Makefile.in has been built.
+
+@item Some documentation has been updated.
+
+@item VMIPS is being adapted to use GNU Autoconf and Automake.
+@end itemize
+
+@node References, Copying, Release History, Top
+@appendix References
+
+Silicon Graphics, Inc. @cite{The R10000 Microprocessor
+User's Manual - Version 2.0.} Available from
+@display
+@url{http://techpubs.sgi.com/library/tpl/cgi-bin/getdoc.cgi/hdwr/bks/
+SGI_Developer/R10K_UM}
+@end display
+as of June 1, 2004.
+
+@quotation
+This is a good reference about a typical 64-bit MIPS processor,
+and also has some useful application notes. However, the processor it
+describes is currently much more advanced than the VMIPS simulation.
+@end quotation
+
+Silicon Graphics, Inc. @cite{SGI
+TechPubs Library: The ABI(5) manual page.} Available from
+@display
+@url{http://techpubs.sgi.com/library/tpl/cgi-bin/getdoc.cgi?coll=0650&db=man
+&fname=/usr/share/catman/p_man/cat5/abi.z}
+@end display
+as of June 1, 2004.
+
+@quotation
+This is a short manual page about the three prevalent MIPS ABIs
+(application binary interfaces), termed O32, N32, and N64.
+@end quotation
+
+Silicon Graphics, Inc. @cite{SGI
+TechPubs Library: The MIPS_EXT(5) manual page.} Available from
+@display
+@url{http://techpubs.sgi.com/library/tpl/cgi-bin/getdoc.cgi?cmd=getdoc&
+coll=0650&db=man&fname=5%20mips_ext}
+@end display
+as of June 1, 2004.
+
+@quotation
+This short manual page is a good summary of the differences between
+the various MIPS ISA levels (MIPS-II, MIPS-III, MIPS-IV).
+@end quotation
+
+Kane, Gerry, and Joe Heinrich. @cite{MIPS RISC Architecture.} Upper
+Saddle River, New Jersey: Prentice-Hall, 1992. ISBN 0135904722.
+
+@quotation
+This is a good all-around reference for the 32-bit MIPS
+processors which VMIPS is modelled upon, and it includes a complete list
+of all the 32-bit MIPS-II instructions as well as a description of the
+MIPS TLB, virtual memory, exception behavior, and caches. It is not
+a particularly good reference for the 64-bit versions of the MIPS
+architecture, though.
+@end quotation
+
+Sweetman, Dominic.  @cite{See MIPS Run.} San Francisco: Morgan Kaufmann
+Publishers, 1999. ISBN 1558604103.
+
+@quotation
+This is a general reference in the style of Kane and Heinrich,
+but updated for the MIPS-III, MIPS-IV, and MIPS-V ISAs, and written
+in a much more experienced and less minimalist style, with attempts to
+include useful pieces of MIPS lore.
+@end quotation
+
+Delorie, DJ.  DJGPP COFF Spec. October, 1996. Available from
+@display
+@url{http://www.delorie.com/djgpp/doc/coff}
+@end display
+as of June 1, 2004.
+
+@quotation
+A good online reference for the COFF file format, a form of which was heavily
+used on DEC MIPS implementations.
+@end quotation
+
+Tool Interface Standard Committee.  Executable and Linking
+Format Specification. Version 1.2, May 1995. Available from
+@display
+@url{http://www.linuxbase.org/spec/refspecs/elf/elf.pdf}
+@end display
+as of June 1, 2004.
+
+@quotation
+An online reference for the ELF file format, now the preferred object
+file format for Unix systems.  This document is highly Intel
+architecture-specific, but it provides a lot of useful background material.
+@end quotation
+
+The Santa Cruz Operation. System V Application Binary Interface: MIPS
+RISC Processor Supplement, 3rd Edition, February 1996. Available at
+@display
+@url{ftp://www.linux-mips.org/pub/linux/mips/doc/ABI/mipsabi.pdf}
+@end display
+as of June 1, 2004.
+
+@quotation
+The part of the System V application binary interface guide that pertains
+specifically to MIPS RISC processors.  It describes, among other things,
+a position independent coding model (PIC) for
+MIPS.
+@end quotation
+
+Also worth checking out is
+@display
+@url{http://www.mips.com/publications/index.html}
+@end display
+which points to many MIPS Technologies, Inc. publications.
+
+@node Copying, Index, References, Top
+@appendix Copying
+
+VMIPS and its source code are governed by the GNU General Public License,
+which you should have received a copy of along with VMIPS. It is in the
+source code distribution in the file @file{COPYING}.
+
+VMIPS's documentation is governed by the MIT license.  A copy of that license
+follows:
+
+@include copyright.texi
+
+@node Index, , Copying, Top
+@unnumbered Index
+
+@c About Texinfo Indices
+@c ---------------------
+@c
+@c Texinfo supports 6 indices. In the vmips manual, they are all merged into
+@c a single index, namely, the concept index.  Each index has a command
+@c used to add entries to it, and a two letter code used in @printindex
+@c and @syncodeindex.  @printindex is used at the end of the manual to
+@c print the index.  @syncodeindex is used at the beginning of the manual
+@c to merge indices.
+@c 
+@c A "concept index" listing concepts that are discussed.  `@cindex CONCEPT'
+@c makes an entry in the concept index for CONCEPT.  `cp' is the @printindex
+@c code.
+@c 
+@c A "function index" listing functions (such as entry points of libraries).
+@c `@findex FUNCTION' makes an entry in the function index for FUNCTION.
+@c `fn' is the @printindex code.
+@c 
+@c A "variables index" listing variables (such as global variables of
+@c libraries).  `@vindex VARIABLE' makes an entry in the variable index
+@c for VARIABLE.  `vr' is the @printindex code.
+@c 
+@c A "keystroke index" listing keyboard commands.  `@kindex KEYSTROKE' makes
+@c an entry in the key index for KEYSTROKE.  `ky' is the @printindex code.
+@c 
+@c A "program index" listing names of programs.  `@pindex PROGRAM' makes an
+@c entry in the program index for PROGRAM.  `pg' is the @printindex code.
+@c 
+@c A "data type index" listing data types (such as structures defined
+@c `@tindex DATA TYPE' makes an entry in the data type index for DATA TYPE.
+@c `tp' is the @printindex code.
+
+@printindex cp
+
+@contents
+@bye

@@ -1,0 +1,8 @@
+OPTIONS: -o excmsg -o noinstdump -o nobootmsg
+EXPECTED OUTPUT FOLLOWS:
+Exception 4 (Address error exception (load or instr fetch)) triggered, EPC=bfc00008
+ Priority is 5; delay state is DELAYSLOT; mem access mode is data load
+* Instruction bus error occurred -- HALTING *
+Exception 6 (Instruction bus error) triggered, EPC=bfc01000
+ Priority is 2; delay state is NORMAL; mem access mode is instruction fetch
+** Instruction fetch caused the exception! **

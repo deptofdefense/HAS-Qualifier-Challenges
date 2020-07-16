@@ -1,0 +1,120 @@
+
+14 Test Suite
+*************
+
+VMIPS has a test suite with a small number of regression tests.  It
+uses the DejaGNU test framework, which is written in the Expect
+language.  Expect was written by Don Libes, and is a dialect of Tcl,
+the Tool Command Language by Ousterhout et al.
+
+14.1 How to run the test suite
+==============================
+
+In order to run the test suite or add tests to it, you will need to have
+Expect and DejaGNU installed.  Any version of DejaGNU later than 1.3
+should work fine. We have mostly used Expect version 5.32 or later;
+older versions may have bugs that may lead to unexpected test failures.
+
+   The next step is to configure and build VMIPS from source. This is
+important, because currently, you can only run tests on a freshly built
+copy of VMIPS; no provision exists for testing a previously installed
+copy of VMIPS.  Simply run `./configure' and `make' from the top level
+source directory to build VMIPS. See the "Installation" section of the
+manual for more details.
+
+   To run the test suite, run `make check' from the top level source
+directory.  This will invoke the DejaGNU `runtest' command.  It will
+take a minute or so, and then you will get a count of tests that passed
+and failed.  If you want to see a more comprehensive listing from
+`runtest', pass it the appropriate options through the Makefile, by
+typing, for example: `make RUNTESTFLAGS=--verbose check'.
+
+   You can also run the test suite by changing into the `test_code'
+directory in the source tree and running `runtest --tool vmips'.
+
+   As a general rule, no tests should fail in a released version of
+VMIPS; however, CVS builds may have test failures from time to time.
+
+14.2 Test suite frameworks
+==========================
+
+VMIPS has two comprehensive testing frameworks: the `regcheck'
+framework, whose tests live in the `vmips.regcheck' directory, and the
+`outcheck' framework, whose tests live in the `vmips.outcheck'
+directory. The former looks at the final values of registers after a
+test case is run, and the latter looks at the output that VMIPS prints
+out when a test case is run.
+
+   Each of these main testing frameworks has its own `.exp' file that
+runs it.  You can easily run the subset of the test suite controlled by
+a given `.exp' file, by passing its name on the `runtest' command line.
+For example, if you want to run all the `regcheck' tests, you would
+type: `runtest --tool vmips regcheck.exp'.
+
+   There are a few test cases that do not use either of these
+frameworks, because they have special requirements of some kind or are
+otherwise unique in some inconvenient way. These test cases have their
+own Expect drivers (`.exp' files) and live in the `vmips.misc-tests'
+directory.
+
+   In addition, each test case is defined by a `.par' file that
+contains the parameters of the test.  If you only want to run a single
+test from among the `regcheck' tests, specify its `.par' file after an
+equal sign. For example, you might type: `runtest --tool vmips
+regcheck.exp=mumble.par' to run only the `mumble.par' `regcheck' test.
+
+14.3 How to add a test to the test suite
+========================================
+
+To write a new test case, first decide whether it is easier to have
+your test case print out something or to look at the `haltdumpcpu'
+option's output to verify it. This will tell you whether it should be
+an `outcheck' test (if it prints out something) or a `regcheck' case
+(if you look at the register values).  Then write up a `.par' file for
+the test case -- the best way to learn how to do this, for the time
+being, is to examine the examples in the `test_code' directory. Then
+move the `.par' file and the test code (assembly or C) to the
+appropriate subdirectory for the framework you chose, `vmips.regcheck'
+or `vmips.outcheck'. Now you can try to make sure that it passes (or
+fails, as the case may be), by running `runtest --tool vmips' on it.
+
+   Also, note that you shouldn't add another test to `vmips.misc-tests'
+unless you can't find a way to fit it into any of the existing testing
+frameworks. Adding a test to `vmips.misc-tests' is tricky - you may be
+able to make progress by looking at the other `.exp' files in that
+directory.
+
+14.4 Common problems
+====================
+
+You can get screenfuls of `endian_option was not set' errors if you run
+`runtest' without first making a DejaGNU `site.exp' configuration file
+first.  To make a `site.exp' file, just run `make site.exp' in the
+`test_code' directory.
+
+14.5 Additional test cases needed
+=================================
+
+Test cases should probably be added for the following categories of
+VMIPS behaviors. (This list is from 2002; it is probably a good start,
+but it may be out of date in the sense that it is unlikely to be
+exhaustive.)
+
+   * Vmipstool.
+
+   * The debugger interface.
+
+   * Exceptions: exception prioritizing, non-boot-time exception
+     vectors, all the TLB exceptions, Unimplemented Coprocessor
+     exceptions, Reserved Instruction exceptions, and exceptions due to
+     PC address translation.
+
+   * Check that the TLB does the right thing when you have a dirty entry
+     vs. a non-dirty one.
+
+   * dumpcpu, dumpcp0, haltdumpcp0, bootmsg options.
+
+   * tilde_expand() where it's not your own home directory.
+
+   * Address translations in KSEG0 or KSEG2 or KUSEG or User mode.
+

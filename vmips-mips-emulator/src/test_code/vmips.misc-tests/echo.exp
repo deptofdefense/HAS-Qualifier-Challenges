@@ -1,0 +1,43 @@
+
+#
+# echo.exp
+#
+# This one is tricky because it requires user interaction.
+#
+
+load_lib vmips-misc.exp; misc_test_setup echo
+spawn -noecho $vmips -n -F /dev/null -o [vmips_endian_option] -o excmsg \
+ -o noinstdump -o nobootmsg $romfile
+
+expect { 
+	-ex "? "    { sleep 0.04; send "x" } 
+	-re "^Error"    { verbose "error"; fail $testcase; return }
+	timeout    { verbose "abort";  fail $testcase; return } 
+	eof        { verbose "eof";  fail $testcase; return }
+}
+expect { 
+	-ex "\[x\]"    { sleep 0.04; send "\n" } 
+	timeout    { verbose "abort2";  fail $testcase; return } 
+	eof        { verbose "eof2";  fail $testcase; return }
+}
+expect { 
+	-ex "\r\n? "    { send "\004" } 
+	timeout    { verbose "abort3";  fail $testcase; return } 
+	eof        { verbose "eof3";  fail $testcase; return }
+}
+expect { 
+	-ex "!\r\n"    { verbose "finished successfully" } 
+	timeout    { verbose "abort4";  fail $testcase; return } 
+	eof        { verbose "eof4";  fail $testcase; return }
+}
+expect { 
+	-ex "BREAK instruction reached -- HALTING"    { verbose "halted" } 
+	timeout    { verbose "abort5";  fail $testcase; return } 
+	eof        { verbose "eof5";  fail $testcase; return }
+}
+
+pass $testcase
+
+close
+wait
+

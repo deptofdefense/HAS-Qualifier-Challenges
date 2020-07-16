@@ -1,0 +1,78 @@
+
+xmboot boot loader for VMIPS
+============================
+
+This is a serial-based boot loader which supports loading ECOFF
+executables, which can either be sent over a serial link using the
+XMODEM protocol, or linked with the boot loader.
+
+What's here:
+
+Makefile, Makefile.in - used to build boot.rom
+README - this file
+boot.c - command processor, entry point
+coff.c - procedures to interpret mips coff headers
+coff.h - data structures representing mips coff file & section headers
+lib.c - the "little C library"
+lib.h - public interface to lib.c
+serial.c, serial.h - interface between lib.c and serial device
+xmrcv.c - XMODEM receive code
+xmrcv.h - public interface to xmrcv.c
+panic.c - routine to catch exceptions and print a message
+bootenv.c, bootenv.h - environment processing
+boot.script.in - ld script used for setting up the booter.
+boot_setup.S - low level assembly code for booter; implements DECstation PROM
+ jump table and panic call.
+set_status.S, set_status.h - C routines for getting/setting the CP0 Status word
+
+scripts:
+vmips16M - script for running vmips with extra memory
+vmipsdec - script for running vmips with extra memory and DEC devices
+catrom - shell script that glues an ecoff executable to the booter.
+ (see vmips mailing list archives for details.)
+
+toys:
+loadtest* - hello world program; you can try loading this with the booter, 
+ if you have an ecoff toolchain to compile it with.
+
+runtests - test driver (see below)
+tests that runtests runs:
+libtest.c - test suite for the little C library
+libtest.input - inputs to libtest.c
+libtest.output - expected outputs from libtest.c
+pftest.c - vmips-hosted tests for printf in little C library
+pftest.output - expected output from pftest.c
+testbootenv.c - test code for bootenv.c
+testbootenv.output - expected outputs from testbootenv.c
+
+
+Testing infrastructure for xmboot
+=================================
+
+How to test the booter:
+ * runtests is a shellscript that runs all the test programs.
+ * Run it with "sh runtests".
+ * It produces dejagnu-style output but does not use dejagnu. We'll
+   rewrite this later to work using dejagnu.
+
+What it currently runs:
+ * testbootenv, libtest and pftest (on host only!)
+
+Tests need to be written for the following modules:
+ * boot.c
+ * coff.c
+ * panic.c
+ * serial.c
+ * xmrcv.c
+
+Infrastructure work:
+ * These tests should be rewritten as dejagnu tests.  The infrastructure
+   is probably pretty simple to write.  One complication is that the tests
+   should be run on both the host and on vmips.
+ * In order to run tests unchanged under both vmips and the host, we would
+   like to handle main() correctly. This is already OK for C programs, all
+   we need to do is teach vmipstool to link in libgcc.a and implement an
+   atexit() that doesn't do anything. This will not be OK for C++ programs.
+   Then, maybe, the entry()/main() hack can go away, and maybe the mess of
+   ld.scripts in xmboot can go away, too.
+

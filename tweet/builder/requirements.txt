@@ -1,0 +1,3 @@
+numpy==1.16.6
+-e git+/home/cliff/work/challenges/tweet/../tweet_old/@6900957fb636b65d4177edf9a7c8a6c8c8d30e22#egg=pi3d&subdirectory=builder/pi3d
+Pillow==6.2.2

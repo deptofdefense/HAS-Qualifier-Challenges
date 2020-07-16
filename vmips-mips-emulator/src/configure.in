@@ -1,0 +1,183 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(vmips.cc)
+
+dnl Get the canonical and user-supplied names for the host and target. 
+AC_CANONICAL_SYSTEM
+program_prefix=NONE
+AM_INIT_AUTOMAKE(vmips, 1.5.1)
+AM_CONFIG_HEADER(config.h)
+
+dnl Look for mips tool installation:
+AC_ARG_WITH(mips,
+[  --with-mips=MDIR        specify installation prefix of mips cross tools
+                           (default MDIR = /opt/mips)],
+[mipsdir="$withval"],
+[mipsdir="/opt/mips"])dnl
+
+dnl Look for mips tool binaries:
+AC_ARG_WITH(mips-bin,
+[  --with-mips-bin=DIR     specify path to mips cross tools' executables
+                           (default MDIR/bin)],
+[mipsbin="$withval"],
+[mipsbin="${mipsdir}/bin"])dnl
+
+dnl Sanity check the above settings.
+test -d "$mipsdir" || \
+ AC_MSG_WARN([--with-mips directory \"$mipsdir\" does not exist])
+test -d "$mipsbin" || \
+ AC_MSG_WARN([--with-mips-bin directory \"$mipsbin\" does not exist])
+
+dnl Check for C compiler.
+dnl We have to do this early because AC_TRY_CPP depends on it.
+AC_PROG_CC
+
+dnl Try to use extensions to C or POSIX where possible.
+AC_USE_SYSTEM_EXTENSIONS
+
+dnl Check for executable extension.
+dnl Note that this is also required for the testsuite to function (see the
+dnl automake-1.7.8 manual) because the testsuite Makefile.am files
+dnl explicitly set EXEEXT.
+AC_EXEEXT
+
+AC_MSG_CHECKING([for mips tool prefix])
+mipstoolprefix=""
+for file in ${mipsdir}/mips*/bin/*gcc$EXEEXT ${mipsbin}/*gcc$EXEEXT
+do
+	case $file in
+		*\**) mipstoolprefix="";;
+		*\*) mipstoolprefix="";;
+		*) mipstoolprefix=`echo "$file" |sed "s/gcc$EXEEXT//"`;;
+	esac
+done
+AC_MSG_RESULT($mipstoolprefix)
+TESTCODE_DIR="test_code"
+SAMPLE_CODE_TARGETS="setup.o build_xmboot"
+if test "x$mipstoolprefix" = "x"
+then
+AC_MSG_WARN([cannot seem to find any mips tools under $mipsbin])
+AC_MSG_WARN([xmboot and test_code will not be built])
+TESTCODE_DIR=""
+SAMPLE_CODE_TARGETS=""
+fi
+
+MIPSTOOLPREFIX="mipstoolprefix='${mipstoolprefix}'"
+AC_SUBST(TESTCODE_DIR)
+AC_SUBST(SAMPLE_CODE_TARGETS)
+AC_SUBST(mipsbin)
+AC_SUBST(MIPSTOOLPREFIX)
+
+AC_MSG_CHECKING([for cross tools target endianness])
+AC_ARG_WITH(mips-endianness,
+[  --with-mips-endianness=VAL      specify mips cross tools target endianness
+                                   (defaults to guessing from objdump -i)],
+[mipsendianness="$withval"],
+[mipsendianness=no
+ objdump="${mipstoolprefix}objdump"
+ if test -x "$objdump"
+ then
+   mipsendianness=`$objdump -i | awk '/endian/ { print; exit }'`
+ fi
+ case $mipsendianness in
+ *data\ big\ endian*)    mipsendianness="big" ;;
+ *data\ little\ endian*) mipsendianness="little" ;;
+ *)                      mipsendianness="no" ;;
+ esac])dnl
+case $mipsendianness in 
+big) BIGENDIAN="bigendian" ;;
+little) BIGENDIAN="nobigendian" ;;
+no) BIGENDIAN="nobigendian"
+    AC_MSG_WARN([defaulting to little-endian VMIPS]) ;;
+*)  AC_MSG_ERROR([endianness, if specified, must be 'big' or 'little']) ;;
+esac
+AC_MSG_RESULT($mipsendianness)
+AC_SUBST(BIGENDIAN)
+
+AC_ARG_ENABLE(profiling,
+[  --enable-profiling      build profiled VMIPS executable for gprof/gcov])
+AC_MSG_CHECKING([whether to build a profiled version])
+XTRACFLAGS=""
+XTRALDFLAGS=""
+case "x$enable_profiling" in
+xyes) 
+  XTRACFLAGS="$XTRACFLAGS -pg -fprofile-arcs -ftest-coverage"
+  XTRALDFLAGS="$XTRALDFLAGS -pg"
+  enable_profiling="yes"
+  ;;
+*)
+  enable_profiling="no"
+  ;;
+esac
+AC_MSG_RESULT($enable_profiling)
+
+AC_PROG_AWK
+AC_PROG_CXX
+if test "x$GXX" = "xyes"
+then
+	XTRACFLAGS="$XTRACFLAGS -fno-strict-aliasing"
+fi
+AC_SUBST(XTRACFLAGS)
+AC_SUBST(XTRALDFLAGS)
+VMIPS_CXX_TEMPLATE_FUNCTIONS
+AC_PROG_CPP
+AM_PROG_AS
+AC_PROG_RANLIB
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_GCC_TRADITIONAL
+
+dnl We run our tests using the C compiler, because it turns out that
+dnl lots of autoconf tests are broken using the C++ compiler, and using the
+dnl C results can actually get us farther.
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/time.h unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+VMIPS_TYPE_SOCKLEN_T
+VMIPS_CXX_ATTRIBUTE_NORETURN
+VMIPS_CXX_ATTRIBUTE_FORMAT
+
+dnl Cross compiling will assume 32-bit target...
+dnl we can probably figure out a better way to do this, though.
+AC_CHECK_SIZEOF(long long, 8)
+AC_CHECK_SIZEOF(long, 4)
+AC_CHECK_SIZEOF(int, 4)
+AC_CHECK_SIZEOF(short, 2)
+AC_CHECK_SIZEOF(char, 1)
+
+dnl Checks for library functions.
+AC_FUNC_MMAP
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(gettimeofday strdup strerror random select)
+AC_SEARCH_LIBS(socket, socket)
+AC_SEARCH_LIBS(inet_ntoa, nsl) 
+dnl Work around automake 1.5 and 1.6 bugs.
+AC_DEFINE(ASFLAGS,[],[Currently not used.])
+AC_SUBST(ASFLAGS)
+AC_DEFINE(AS,[],[Currently not used.])
+AC_SUBST(AS)
+AC_DEFINE(CCASFLAGS,[],[Currently not used.])
+AC_SUBST(CCASFLAGS)
+AC_DEFINE(CCAS,[],[Currently not used.])
+AC_SUBST(CCAS)
+
+AC_OUTPUT([Makefile
+ vmips.spec
+ vmipsrc
+ doc/Makefile
+ libopcodes_mips/Makefile
+ sample_code/Makefile
+ sample_code/xmboot/Makefile
+ test_code/Makefile
+ test_code/vmips.misc-tests/Makefile
+ test_code/vmips.outcheck/Makefile
+ test_code/vmips.regcheck/Makefile])

@@ -1,0 +1,11 @@
+service att_chal
+{
+  disable     = no
+  socket_type = stream
+  protocol    = tcp
+  port        = 31339
+  wait        = no
+  user        = root
+  server      = /usr/bin/docker
+  server_args = run -i --rm -e "TRIALS=5" attitude:challenge 
+}

@@ -1,0 +1,1 @@
+/usr/bin/cc  -m32 -m32 -g  -rdynamic CMakeFiles/elf2cfetbl.dir/elf2cfetbl.c.o  -o elf2cfetbl 

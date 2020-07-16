@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Folder>
+    <name>HackASatCompetition</name>
+    <visibility>0</visibility>
+    <open>0</open>
+    <description>HackASatComp1</description>
+    <NetworkLink>
+      <name>View Centered Placemark</name>
+      <visibility>0</visibility>
+      <open>0</open>
+      <description>This is where the satellite was located when we saw it.</description>
+      <refreshVisibility>0</refreshVisibility>
+      <flyToView>0</flyToView>
+      <LookAt id="ID">
+        <!-- specific to LookAt -->
+        <longitude>FILL ME IN</longitude>            	<!-- kml:angle180 -->
+        <latitude>FILL ME IN TOO</latitude>              	<!-- kml:angle90 -->
+        <altitude>FILL ME IN AS WELL</altitude>              		<!-- double -->
+        <heading>FILL IN THIS VALUE</heading>                <!-- kml:angle360 -->
+        <tilt>FILL IN THIS VALUE TOO</tilt>                     <!-- kml:anglepos90 -->
+        <range>FILL IN THIS VALUE ALSO</range>                     <!-- double -->
+        <altitudeMode>clampToGround</altitudeMode>
+      </LookAt>
+      <Link>
+        <href>http://FILL ME IN:FILL ME IN/cgi-bin/HSCKML.py</href>
+        <refreshInterval>1</refreshInterval>
+        <viewRefreshMode>onStop</viewRefreshMode>
+        <viewRefreshTime>1</viewRefreshTime>
+        <viewFormat>BBOX=[bboxWest],[bboxSouth],[bboxEast],[bboxNorth];CAMERA=[lookatLon],[lookatLat],[lookatRange],[lookatTilt],[lookatHeading];VIEW=[horizFov],[vertFov],[horizPixels],[vertPixels],[terrainEnabled]</viewFormat>
+      </Link>
+    </NetworkLink>
+  </Folder>
+</kml>

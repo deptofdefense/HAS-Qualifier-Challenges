@@ -1,0 +1,3 @@
+OPTIONS: -o noexcmsg -o noinstdump -o nobootmsg
+EXPECTED OUTPUT FOLLOWS:
+Z* BREAK instruction reached -- HALTING *
