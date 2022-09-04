@@ -309,4 +309,4 @@ resources:
 
 .. |Space Packet| raw:: html
 
-    <a href="https://public.ccsds.org/Pubs/133x0b1c2.pdf" target="_blank">Space Packet</a>
+    <a href="https://public.ccsds.org/Pubs/133x0b2e1.pdf" target="_blank">Space Packet</a>
